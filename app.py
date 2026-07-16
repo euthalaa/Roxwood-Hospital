@@ -8,17 +8,16 @@ st.set_page_config(
     layout="wide"
 )
 
-# Menghilangkan padding bawaan Streamlit agar iframe HTML terlihat penuh & menyatu
+# MENYEMBUNYIKAN PADDING (Sudah diperbaiki parameternya)
 st.markdown("""
     <style>
         .block-container { padding: 0px !important; }
         footer { visibility: hidden; }
         #MainMenu { visibility: hidden; }
     </style>
-""", unsafe_as_allowed=True)
+""", unsafe_allow_html=True)
 
 # 1. Ambil API Key Gemini secara aman dari Streamlit Secrets
-# Jika dijalankan lokal, sistem akan mencari di file .streamlit/secrets.toml
 try:
     GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 except Exception:
