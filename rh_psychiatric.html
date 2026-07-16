@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roxwood Hospital - Psychiatry CDSS</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons (Material Symbols Rounded) -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        rxBg: '#F8FAFB',
+                        rxCard: '#FFFFFF',
+                        rxPrimary: '#2F7A78',
+                        rxPrimaryHover: '#215E5C',
+                        rxSecondary: '#EAF7F6',
+                        rxBorder: '#E3E7EA',
+                        rxTextMain: '#2D3748',
+                        rxTextSub: '#6B7280',
+                        rxSuccess: '#22C55E',
+                        rxWarning: '#F59E0B',
+                        rxDanger: '#EF4444',
+                    },
+                    boxShadow: {
+                        'rx': '0 6px 20px rgba(0,0,0,.05)',
+                    },
+                    borderRadius: {
+                        'rx': '16px',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F8FAFB;
+            color: #2D3748;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Card styles matching premium healthcare aesthetics */
+        .rx-card {
+            background-color: #FFFFFF;
+            border: 1px solid #E3E7EA;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0,0,0,.05);
+            padding: 1.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .rx-card:hover {
+            box-shadow: 0 10px 25px rgba(0,0,0,.08);
+        }
+        
+        .rx-input {
+            width: 100%;
+            border: 1px solid #E3E7EA;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: #2D3748;
+            background-color: #FAFAFA;
+            outline: none;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+        .rx-input:focus {
+            border-color: #2F7A78;
+            background-color: #FFFFFF;
+            box-shadow: 0 0 0 3px #EAF7F6;
+        }
+        .rx-input::placeholder {
+            color: #A0AEC0;
+            font-style: italic;
+        }
+
+        .rx-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #2D3748;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .rx-header-icon {
+            color: #2F7A78;
+            font-size: 1.25rem;
+        }
+
+        /* Core Action Button (Deep Teal) */
+        .rx-btn-primary {
+            background-color: #E2E8F0;
+            color: #94A3B8;
+            padding: 1rem 2.5rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            cursor: not-allowed;
+            border: 1px solid transparent;
+        }
+        
+        .rx-btn-primary.active {
+            background-color: #2F7A78;
+            color: #FFFFFF;
+            cursor: pointer;
+        }
+        
+        .rx-btn-primary.active:hover {
+            background-color: #215E5C;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(47, 122, 120, 0.35);
+        }
+
+        .info-box {
+            background-color: #F8FAFB;
+            border: 1px solid #E3E7EA;
+            border-radius: 8px;
+            padding: 0.75rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+
+        .info-box span {
+            color: #2F7A78;
+            font-size: 1.25rem;
+        }
+
+        .info-box p {
+            font-size: 0.8rem;
+            color: #6B7280;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        /* Spinner */
+        .loader {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Indicator Dots */
+        .dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .dot-low { background-color: #22C55E; }
+        .dot-mod { background-color: #F59E0B; }
+        .dot-high { background-color: #EF4444; }
+
+        /* Loader Skeletons */
+        .skeleton {
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: 4px;
+        }
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-6 lg:p-8">
+
+    <!-- HEADER BAR -->
+    <header class="max-w-[1700px] mx-auto flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4 border-b border-rxBorder pb-5">
+        <div class="flex items-center gap-4">
+            <div class="bg-rxPrimary p-2.5 rounded-2xl text-white shadow-md">
+                <span class="material-symbols-rounded text-4xl">psychiatry</span>
+            </div>
+            <div>
+                <h1 class="text-2xl font-extrabold tracking-tight text-rxTextMain flex items-center gap-2">
+                    ROXWOOD HOSPITAL <span class="text-rxPrimary font-normal">| PSYCHIATRY CENTER</span>
+                </h1>
+                <p class="text-rxTextSub text-sm mt-0.5">Sistem Pendukung Keputusan Klinis Berbasis Evidence-Based Medicine</p>
+            </div>
+        </div>
+        
+        <div class="hidden xl:block text-center max-w-lg">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-rxPrimary">AI Clinical Decision Support System (CDSS)</h2>
+            <p class="text-xs text-rxTextSub mt-1">Interaksi dinamis, pemutakhiran diagnosa, dan analisis psikometri terintegrasi.</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <button id="btnLoadSample" class="bg-rxSecondary text-rxPrimary hover:bg-rxPrimary hover:text-white transition-all px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 border border-rxPrimary/10 shadow-sm">
+                <span class="material-symbols-rounded text-base">database</span>
+                Muat Kasus John Doe
+            </button>
+            <div class="bg-white border border-rxBorder py-2 px-4 rounded-xl flex items-center gap-3 shadow-sm text-xs">
+                <span class="material-symbols-rounded text-rxPrimary">calendar_month</span>
+                <div class="text-left">
+                    <div id="currentDate" class="font-bold text-rxTextMain">14 Juli 2026</div>
+                    <div id="currentTime" class="text-[10px] text-rxTextSub">13:45 WIB</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN APPLICATION GRID -->
+    <main class="max-w-[1700px] mx-auto space-y-8">
+
+        <!-- ROW 1: ASSESSMENT CONFIGURATION & PATIENT DATA -->
+        <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+            
+            <!-- 1. ASSESSMENT CONFIGURATION -->
+            <div class="rx-card flex flex-col h-full justify-between">
+                <div>
+                    <div class="flex items-center gap-2.5 mb-5 pb-2 border-b border-rxBorder">
+                        <span class="material-symbols-rounded rx-header-icon">person_apron</span>
+                        <h3 class="font-bold text-rxTextMain text-xs tracking-wider uppercase">1. Assessment Config</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="rx-label">Psychiatry Department</label>
+                            <select class="rx-input appearance-none bg-white" id="in-dept">
+                                <option value="Adult Psychiatry" selected>Adult Psychiatry</option>
+                                <option value="Child & Adolescent Psychiatry">Child & Adolescent Psychiatry</option>
+                                <option value="Geriatric Psychiatry">Geriatric Psychiatry</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="rx-label">Assessment Type</label>
+                            <select class="rx-input appearance-none bg-white" id="in-type">
+                                <option value="Initial Assessment" selected>Initial Assessment</option>
+                                <option value="Follow-up">Follow-up</option>
+                                <option value="Emergency Evaluation">Emergency Evaluation</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="rx-label">Priority</label>
+                            <select class="rx-input appearance-none bg-white" id="in-priority">
+                                <option value="Routine" selected>Routine</option>
+                                <option value="Urgent">Urgent</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-box mt-6">
+                    <span class="material-symbols-rounded text-lg">info</span>
+                    <p>Konfigurasi awal menentukan sensitivitas analisis kognitif model.</p>
+                </div>
+            </div>
+
+            <!-- 2. PATIENT INFORMATION -->
+            <div class="rx-card flex flex-col h-full">
+                <div class="flex items-center gap-2.5 mb-5 pb-2 border-b border-rxBorder">
+                    <span class="material-symbols-rounded rx-header-icon">person</span>
+                    <h3 class="font-bold text-rxTextMain text-xs tracking-wider uppercase">2. Patient Information</h3>
+                </div>
+                <div class="space-y-4 flex-grow">
+                    <div>
+                        <label class="rx-label">Patient Name</label>
+                        <input type="text" id="in-pat-name" class="rx-input" placeholder="Masukkan nama lengkap pasien...">
+                    </div>
+                    <div>
+                        <label class="rx-label">Date of Birth</label>
+                        <input type="date" id="in-pat-dob" class="rx-input">
+                    </div>
+                    <div>
+                        <label class="rx-label">Citizen ID</label>
+                        <input type="text" id="in-pat-id" class="rx-input" placeholder="Masukkan Citizen ID...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. REQUESTING DOCTOR -->
+            <div class="rx-card flex flex-col h-full justify-between">
+                <div>
+                    <div class="flex items-center gap-2.5 mb-5 pb-2 border-b border-rxBorder">
+                        <span class="material-symbols-rounded rx-header-icon">stethoscope</span>
+                        <h3 class="font-bold text-rxTextMain text-xs tracking-wider uppercase">3. Requesting Doctor</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="rx-label">Doctor Name & Title</label>
+                            <input type="text" id="in-doc-name" class="rx-input" placeholder="e.g. dr. Ammabel L Kalux">
+                        </div>
+                    </div>
+                </div>
+                <div class="info-box mt-6">
+                    <span class="material-symbols-rounded text-lg">verified_user</span>
+                    <p>Pastikan identitas dokter pemeriksa benar untuk penandatanganan rekam medis.</p>
+                </div>
+            </div>
+
+            <!-- 4. CLINICAL INFORMATION -->
+            <div class="rx-card flex flex-col h-full">
+                <div class="flex items-center gap-2.5 mb-5 pb-2 border-b border-rxBorder">
+                    <span class="material-symbols-rounded rx-header-icon">description</span>
+                    <h3 class="font-bold text-rxTextMain text-xs tracking-wider uppercase">4. Clinical Information</h3>
+                </div>
+                <div class="space-y-4 flex-grow flex flex-col">
+                    <div>
+                        <label class="rx-label">Chief Complaint / Keluhan Utama</label>
+                        <input type="text" id="in-complaint" class="rx-input" placeholder="e.g. Sulit tidur, sering sedih, cemas berlebih...">
+                    </div>
+                    <div class="flex-grow flex flex-col">
+                        <label class="rx-label">Anamnesis / Temuan Klinis / Diagnosis Kerja</label>
+                        <textarea id="in-anamnesis" class="rx-input flex-grow resize-none text-xs" rows="4" placeholder="Tulis riwayat keluhan, durasi, intensitas, faktor stressor, serta indikasi klinis awal secara terperinci..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CORE TRIGGER SECTION -->
+        <div class="bg-white border border-rxBorder rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center text-center">
+            <button id="btnMulai" class="rx-btn-primary max-w-xl transition-all duration-300" disabled>
+                <span class="material-symbols-rounded">neurology</span>
+                Mulai Assessment
+            </button>
+            <p id="lblValidationHint" class="text-xs text-rxDanger mt-3 font-semibold flex items-center gap-1.5">
+                <span class="material-symbols-rounded text-sm">warning</span> Lengkapi seluruh kolom input rekam medis di atas untuk memulai analisis klinis AI.
+            </p>
+        </div>
+
+        <!-- DYNAMIC RESULTS WORKSPACE (Initially hidden) -->
+        <div id="resultsArea" class="hidden space-y-8">
+            
+            <!-- ROW 2: CHAT INTERVIEW, IMPRESSION PROGRESS, & MSE -->
+            <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- 5. CLINICAL INTERVIEW CHAT PANEL -->
+                <div class="rx-card lg:col-span-5 flex flex-col h-[600px] justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4 pb-2 border-b border-rxBorder">
+                            <div class="flex items-center gap-2.5">
+                                <span class="material-symbols-rounded rx-header-icon">forum</span>
+                                <h3 class="font-bold text-rxTextMain text-xs tracking-wider uppercase">5. Clinical Interview (AI-Generated)</h3>
+                            </div>
+                            <span id="interviewProgressBadge" class="bg-rxSecondary text-rxPrimary px-3 py-1 rounded-full text-xs font-bold">Inisialisasi...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Chat Container Window -->
+                    <div id="chatWindow" class="flex-grow overflow-y-auto pr-1 space-y-4 text-xs scroll-smooth">
+                        <!-- Instantiated chat bubbles are appended here -->
+                    </div>
+
+                    <!-- Input / Patient Reply panel -->
+                    <div class="border-t border-rxBorder pt-4 mt-3">
+                        <div class="flex flex-col gap-2">
+                            <!-- Quick choice helper buttons -->
+                            <div id="quickOptions" class="flex gap-2 mb-1 justify-start">
+                                <button onclick="quickReply('Ya')" class="bg-slate-100 hover:bg-rxSecondary hover:text-rxPrimary text-[10px] font-bold px-3 py-1.5 rounded-lg border border-slate-200 transition-colors">Ya</button>
+                                <button onclick="quickReply('Tidak')" class="bg-slate-100 hover:bg-rxSecondary hover:text-rxPrimary text-[10px] font-bold px-3 py-1.5 rounded-lg border border-slate-200 transition-colors">Tidak</button>
+                                <button onclick="quickReply('Tidak yakin')" class="bg-slate-100 hover:bg-rxSecondary hover:text-rxPrimary text-[10px] font-bold px-3 py-1.5 rounded-lg border border-slate-200 transition-colors">Tidak yakin</button>
+                            </div>
+                            
+                            <textarea id="in-patient-reply" class="rx-input text-xs resize-none" rows="2" placeholder="Tulis atau pilih respons pasien di sini..." disabled></textarea>
+                            
+                            <div class="flex justify-between items-center gap-2 mt-1">
+                                <button id="btnSkipInterview" class="text-rxTextSub hover:text-rxDanger transition-colors text-[10px] font-bold flex items-center gap-1" disabled>
+                                    <span class="material-symbols-rounded text-sm">skip_next</span> Selesaikan & Diagnosis Sekarang
+                                </button>
+                                <button id="btnNextQuestion" class="bg-rxPrimary hover:bg-rxPrimaryHover text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-all flex items-center gap-1" disabled>
+                                    <span>Lanjutkan Pertanyaan</span>
+                                    <span class="material-symbols-rounded text-sm">arrow_forward</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. CLINICAL IMPRESSION PROGRESS -->
+                <div class="rx-card lg:col-span-3 flex flex-col h-[600px] justify-between">
+                    <div>
+                        <div class="flex items-center gap-2.5 mb-4 pb-2 border-b border-rxBorder">
+                            <span class="material-symbols-rounded rx-header-icon">analytics</span>
+                            <h3 class="font-bold text-rxTextMain text-xs tracking-wider uppercase">6. Clinical Impression Progress</h3>
+                        </div>
+                        <div class="flex justify-between text-[10px] font-bold text-rxTextSub mb-3">
+                            <span>PROBABLE CONDITION</span>
+                            <span>PROBABILITY</span>
+                        </div>
+                        <div class="space-y-4 overflow-y-auto" id="out-impression">
+                            <div class="text-center text-rxTextSub text-xs italic py-12">Impression akan diperbarui setelah interview berjalan.</div>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <span class="material-symbols-rounded">info</span>
+                        <p class="text-[10px]">Probabilitas diagnosis dinilai secara kontinu berdasarkan kombinasi keluhan awal dan respons interview pasien.</p>
+                    </div>
+                </div>
+
+                <!-- 7. PSYCHIATRIC ASSESSMENT (MSE) -->
+                <div class="rx-card lg:col-span-4 flex flex-col h-[600px]">
+                    <div class="flex items-center gap-2.5 mb-4 pb-2 border-b border-rxBorder">
+                        <span class="material-symbols-rounded rx-header-icon">psychology_alt</span>
+                        <h3 class="font-bold text-rxTextMain text-xs tracking-wider uppercase">7. Psychiatric Assessment (MSE)</h3>
+                    </div>
+                    <div class="grid grid-cols-1 gap-y-3.5 overflow-y-auto flex-grow content-start pr-1 text-xs" id="out-mse">
+                        <div class="text-center text-rxTextSub text-xs italic py-16">Menunggu wawancara berakhir untuk melengkapi rekapitulasi pemeriksaan status mental.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ROW 3: FINAL ASSESSMENTS (5 COLUMNS GRID) -->
+            <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                
+                <!-- 8. DIAGNOSIS -->
+                <div class="rx-card flex flex-col h-[380px] justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-4 pb-2 border-b border-rxBorder">
+                            <span class="material-symbols-rounded rx-header-icon">clinical_research</span>
+                            <h3 class="font-bold text-rxTextMain text-xs tracking-wider uppercase">8. Diagnosis</h3>
+                        </div>
+                        <div class="space-y-4 overflow-y-auto max-h-[280px] pr-1">
+                            <div>
+                                <span class="text-[9px] font-bold text-rxTextSub uppercase tracking-wider block mb-1">Primary Diagnosis</span>
+                                <div id="out-diag-primary-box" class="flex flex-col gap-1.5">
+                                    <span class="text-xs text-rxTextSub italic">Menunggu evaluasi selesai...</span>
+                                </div>
+                            </div>
+                            <div class="pt-2 border-t border-dashed border-rxBorder">
+                                <span class="text-[9px] font-bold text-rxTextSub uppercase tracking-wider block mb-1">Differential Diagnosis</span>
+                                <ul id="out-diag-diff" class="list-disc pl-4 text-xs text-rxTextMain space-y-1">
+                                    <li class="text-rxTextSub italic list-none pl-0">Menunggu evaluasi selesai...</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 9. SEVERITY & RISK ASSESSMENT -->
+                <div class="rx-card flex flex-col h-[380px] justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-4 pb-2 border-b border-rxBorder">
+                            <span class="material-symbols-rounded rx-header-icon">warning_amber</span>
+                            <h3 class="font-bold text-rxTextMain text-xs tracking-wider uppercase">9. Severity & Risk Assessment</h3>
+                        </div>
+                        <div class="space-y-4 overflow-y-auto pr-1" id="out-risk">
+                            <div class="text-xs text-rxTextSub italic text-center py-10">Menunggu diagnosis...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 10. TREATMENT PLAN -->
+                <div class="rx-card flex flex-col h-[380px] justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-4 pb-2 border-b border-rxBorder">
+                            <span class="material-symbols-rounded rx-header-icon">assignment_turned_in</span>
+                            <h3 class="font-bold text-rxTextMain text-xs tracking-wider uppercase">10. Treatment Plan</h3>
+                        </div>
+                        <ul id="out-plan" class="list-disc pl-4 text-xs text-rxTextMain space-y-2 flex-grow overflow-y-auto max-h-[280px]">
+                            <li class="text-rxTextSub italic list-none pl-0 text-center py-10">Menunggu terapi...</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 11. MEDICATION RECOMMENDATION -->
+                <div class="rx-card flex flex-col h-[380px] justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-4 pb-2 border-b border-rxBorder">
+                            <span class="material-symbols-rounded rx-header-icon">pill</span>
+                            <h3 class="font-bold text-rxTextMain text-xs tracking-wider uppercase">11. Medication Recommendation</h3>
+                        </div>
+                        <div class="overflow-x-auto overflow-y-auto max-h-[220px]">
+                            <table class="w-full text-left text-[11px]">
+                                <thead class="text-rxTextSub border-b border-rxBorder font-bold uppercase tracking-wider">
+                                    <tr>
+                                        <th class="pb-2">Med</th>
+                                        <th class="pb-2">Dose</th>
+                                        <th class="pb-2">Freq</th>
+                                        <th class="pb-2">Dur</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="out-meds" class="text-rxTextMain">
+                                    <tr>
+                                        <td colspan="4" class="py-10 text-center text-rxTextSub italic">Belum ada rekomendasi.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="info-box !py-2 !px-3 mt-2">
+                        <span class="material-symbols-rounded text-base">info</span>
+                        <p class="text-[9px]">Sesuaikan dosis berdasarkan respons klinis serta toleransi metabolisme pasien.</p>
+                    </div>
+                </div>
+
+                <!-- 12. CLINICAL REPORT PREVIEW -->
+                <div class="rx-card flex flex-col h-[380px] bg-slate-50/50 border-dashed border-2 relative overflow-hidden p-0">
+                    <!-- Header -->
+                    <div class="flex justify-between items-center p-4 border-b border-rxBorder bg-white z-10">
+                        <h3 class="font-bold flex items-center gap-2 text-rxTextMain text-xs tracking-wider uppercase">
+                            <span class="material-symbols-rounded rx-header-icon">task</span> 12. Report Preview
+                        </h3>
+                        <button type="button" id="btnPrintReport" class="border border-rxPrimary text-rxPrimary hover:bg-rxSecondary px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-[10px] font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            <span class="material-symbols-rounded text-[14px]">download</span> Export PDF
+                        </button>
+                    </div>
+
+                    <!-- Paper Mockup -->
+                    <div class="flex-grow bg-white border border-gray-200 shadow-sm mx-4 mb-4 mt-3 rounded relative overflow-hidden text-[8px] flex flex-col" id="report-preview-content">
+                         <!-- Background Logo Watermark -->
+                         <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none text-rxPrimary">
+                              <span class="material-symbols-rounded" style="font-size: 100px;">psychiatry</span>
+                         </div>
+                         
+                         <div class="relative z-10 p-4 overflow-y-auto flex-grow flex flex-col">
+                             <div class="text-center text-rxPrimaryHover font-bold text-[10px] mb-2 border-b border-rxSecondary pb-1 flex flex-col items-center relative">
+                                 <span>ROXWOOD HOSPITAL</span>
+                                 <span class="text-rxPrimary">PSYCHIATRY REPORT</span>
+                                 <div class="absolute top-0 right-0 text-rxSecondary text-xl"><span class="material-symbols-rounded">medical_services</span></div>
+                             </div>
+                             
+                             <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 mb-2 text-rxTextMain font-medium text-[7px]">
+                                 <div><span class="text-rxTextSub w-12 inline-block">Patient Name</span>: <span id="prev-name">-</span></div>
+                                 <div><span class="text-rxTextSub w-12 inline-block">Doctor</span>: <span id="prev-doctor">-</span></div>
+                                 <div><span class="text-rxTextSub w-12 inline-block">DOB</span>: <span id="prev-dob">-</span></div>
+                                 <div><span class="text-rxTextSub w-12 inline-block">Dept</span>: <span id="prev-dept">-</span></div>
+                                 <div><span class="text-rxTextSub w-12 inline-block">Citizen ID</span>: <span id="prev-id">-</span></div>
+                                 <div><span class="text-rxTextSub w-12 inline-block">Date</span>: <span id="prev-date">-</span></div>
+                             </div>
+                             
+                             <div class="text-rxPrimary font-bold border-b border-gray-100 pb-0.5 mb-1.5 uppercase text-[8px]">HASIL ASESMEN</div>
+                             
+                             <div class="space-y-2 flex-grow">
+                                 <div>
+                                     <div class="text-rxPrimary font-bold uppercase text-[7px] mb-0.5">KELUHAN & ANAMNESIS</div>
+                                     <div id="prev-anamnesis" class="text-rxTextMain leading-tight text-[7px] line-clamp-3">-</div>
+                                 </div>
+                                 <div>
+                                     <div class="text-rxPrimary font-bold uppercase text-[7px] mb-0.5">DIAGNOSIS UTAMA</div>
+                                     <div id="prev-diagnosis" class="text-rxTextMain leading-tight font-bold text-[8px]">-</div>
+                                 </div>
+                                 <div>
+                                     <div class="text-rxPrimary font-bold uppercase text-[7px] mb-0.5">TINGKAT RISIKO</div>
+                                     <div id="prev-risk" class="text-rxTextMain leading-tight text-[7px]">-</div>
+                                 </div>
+                                 <div>
+                                     <div class="text-rxPrimary font-bold uppercase text-[7px] mb-0.5">KESIMPULAN KLINIS</div>
+                                     <div id="prev-clinical-summary" class="text-rxTextMain leading-tight text-[7px] line-clamp-3">-</div>
+                                 </div>
+                                 <div>
+                                     <div class="text-rxPrimary font-bold uppercase text-[7px] mb-0.5">REKOMENDASI TERAPI</div>
+                                     <ul id="prev-terapi" class="list-disc pl-3 text-rxTextMain leading-tight text-[7px] space-y-0.5">-</ul>
+                                 </div>
+                                 <div>
+                                     <div class="text-rxPrimary font-bold uppercase text-[7px] mb-0.5">RENCANA FARMAKOTERAPI</div>
+                                     <div id="prev-meds" class="text-rxTextMain leading-tight text-[7px]">-</div>
+                                 </div>
+                             </div>
+                             
+                             <div class="mt-2 pt-1 border-t border-gray-100 text-center text-rxTextSub text-[6px] flex justify-between items-end">
+                                 <div class="text-left flex flex-col justify-between h-full">
+                                     <p class="mb-1">Divalidasi elektronik.</p>
+                                     <div class="mt-1">
+                                         <p class="text-rxTextSub mb-0.5">DPJP:</p>
+                                         <div id="prev-signature" class="text-[16px] text-rxPrimaryHover leading-none mb-0.5" style="font-family: 'Caveat', cursive;">-</div>
+                                         <p class="font-bold text-rxTextMain border-t border-gray-200 inline-block pt-0.5 min-w-[60px]" id="prev-doctor-sign-name">-</p>
+                                     </div>
+                                 </div>
+                                 <div class="text-right flex flex-col items-end">
+                                     <p class="font-bold text-rxTextMain mb-1">ROXWOOD HOSPITAL</p>
+                                     <div class="w-8 h-8 rounded-full border border-rxSecondary text-rxPrimary flex items-center justify-center flex-col text-[4px] font-bold">
+                                         <span>SEALED</span>
+                                         <span class="material-symbols-rounded text-[8px] my-0.5">verified</span>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PREVIEW STAMP CONTAINER FOR PRINTING (Visual hidden on screen, printed on output) -->
+            <div id="print-area" class="hidden">
+                <div style="font-family: 'Inter', sans-serif; max-width: 800px; margin: 0 auto; padding: 40px; border: 1px solid #E3E7EA; border-radius: 12px; background: white; position: relative;">
+                    
+                    <!-- Watermark Seal -->
+                    <div style="position: absolute; right: 40px; bottom: 80px; opacity: 0.12; transform: rotate(-10deg); pointer-events: none;">
+                        <div style="border: 4px double #2F7A78; color: #2F7A78; padding: 15px 30px; border-radius: 50%; font-weight: bold; text-align: center; font-size: 14px;">
+                            ROXWOOD HOSPITAL<br>
+                            E-HEALTH CDSS CERTIFIED<br>
+                            VALIDATED SEALS
+                        </div>
+                    </div>
+
+                    <!-- Hospital Header -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #2F7A78; padding-bottom: 15px; margin-bottom: 25px;">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="background-color: #2F7A78; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 24px;">H</div>
+                            <div>
+                                <h2 style="margin: 0; color: #2F7A78; font-size: 18px; font-weight: 800; letter-spacing: 0.5px;">ROXWOOD HOSPITAL PSYCHIATRY CENTER</h2>
+                                <p style="margin: 3px 0 0 0; font-size: 10px; color: #6B7280;">Route 1, Paleto Cove, San Andreas. Telp. /211</p>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="background-color: #2F7A78; color: white; font-size: 8px; padding: 4px 8px; font-weight: bold; border-radius: 4px;"</span>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-bottom: 25px;">
+                        <h3 style="margin: 0; font-size: 14px; font-weight: bold; color: #2D3748; text-transform: uppercase; letter-spacing: 1px;">LAPORAN PEMERIKSAAN KESEHATAN JIWA & ASESMEN PSIKIATRI</h3>
+                        <p style="margin: 5px 0 0 0; font-size: 11px; color: #6B7280;">Berdasarkan Pemeriksaan Status Mental (MSE) & Wawancara Diagnostik</p>
+                    </div>
+
+                    <!-- Metadata Grid -->
+                    <div style="display: grid; grid-template-cols: 1fr 1fr; gap: 20px; font-size: 11px; background-color: #F8FAFB; padding: 15px; border-radius: 8px; border: 1px solid #E3E7EA; margin-bottom: 25px;">
+                        <div>
+                            <p style="margin: 4px 0;"><strong style="color: #6B7280; width: 120px; display: inline-block;">Nama Pasien:</strong> <span id="lbl-rep-pat-name" style="font-weight: bold; color: #2D3748;">-</span></p>
+                            <p style="margin: 4px 0;"><strong style="color: #6B7280; width: 120px; display: inline-block;">Tanggal Lahir:</strong> <span id="lbl-rep-pat-dob">-</span></p>
+                            <p style="margin: 4px 0;"><strong style="color: #6B7280; width: 120px; display: inline-block;">Citizen ID:</strong> <span id="lbl-rep-pat-id">-</span></p>
+                        </div>
+                        <div>
+                            <p style="margin: 4px 0;"><strong style="color: #6B7280; width: 120px; display: inline-block;">Dokter Pemeriksa:</strong> <span id="lbl-rep-doc" style="font-weight: bold;">-</span></p>
+                            <p style="margin: 4px 0;"><strong style="color: #6B7280; width: 120px; display: inline-block;">Waktu Sesi:</strong> <span id="lbl-rep-date">-</span></p>
+                            <p style="margin: 4px 0;"><strong style="color: #6B7280; width: 120px; display: inline-block;">Departemen:</strong> <span id="lbl-rep-dept">-</span></p>
+                        </div>
+                    </div>
+
+                    <div id="print-detailed-content" style="font-size: 11px; line-height: 1.6; color: #2D3748; space-y: 20px;">
+                        <!-- AI Structured content goes here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SYSTEM NOTICE / WARNING MODAL -->
+        <div id="rxModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-rxBorder transform scale-95 transition-transform duration-300">
+                <div class="flex items-center gap-3 text-rxDanger mb-3" id="rxModalHeader">
+                    <span class="material-symbols-rounded text-3xl">warning</span>
+                    <h4 class="font-bold text-rxTextMain text-lg">Pemberitahuan</h4>
+                </div>
+                <p class="text-xs text-rxTextSub mb-6 leading-relaxed" id="rxModalBody"></p>
+                <div class="text-right">
+                    <button id="btnRxModalClose" class="bg-rxPrimary hover:bg-rxPrimaryHover text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md">Tutup</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATEMENT FOOTER -->
+        <footer class="text-center text-[10px] text-rxTextSub mt-12 pb-6 flex items-center justify-center gap-2">
+            <span class="material-symbols-rounded text-xs text-rxPrimary">shield</span>
+            Aplikasi simulasi ini ditujukan khusus untuk roleplay akademis/medis. Seluruh formulasi diagnosa & resep obat merupakan integrasi kognitif AI.
+        </footer>
+    </main>
+
+    <script>
+        // Update live status date and time
+        function updateClock() {
+            const now = new Date();
+            const optionsDate = { day: 'numeric', month: 'long', year: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', optionsDate);
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Application State Managers
+        let currentTurn = 1;
+        const totalTurns = 4; // Multi-turn interview limits
+        let isInterviewActive = false;
+        let isCompleted = false;
+        let chatHistory = []; // Conversation flow
+
+        // Mandatory Inputs
+        const mandatoryInputIDs = [
+            'in-pat-name', 'in-pat-dob', 'in-pat-id', 'in-doc-name', 'in-complaint', 'in-anamnesis'
+        ];
+
+        // Custom validation checking
+        function checkFormValidity() {
+            let allFilled = true;
+            mandatoryInputIDs.forEach(id => {
+                const elem = document.getElementById(id);
+                if (elem && !elem.value.trim()) {
+                    allFilled = false;
+                }
+            });
+
+            const btnMulai = document.getElementById('btnMulai');
+            const validationHint = document.getElementById('lblValidationHint');
+
+            if (allFilled) {
+                btnMulai.disabled = false;
+                btnMulai.classList.add('active');
+                validationHint.classList.add('hidden');
+            } else {
+                btnMulai.disabled = true;
+                btnMulai.classList.remove('active');
+                validationHint.classList.remove('hidden');
+            }
+        }
+
+        // Attach event triggers
+        mandatoryInputIDs.forEach(id => {
+            const elem = document.getElementById(id);
+            if (elem) {
+                elem.addEventListener('input', checkFormValidity);
+                elem.addEventListener('change', checkFormValidity);
+            }
+        });
+
+        function showNotification(title, message, isError = true) {
+            const modal = document.getElementById('rxModal');
+            const header = document.getElementById('rxModalHeader');
+            const body = document.getElementById('rxModalBody');
+            
+            body.textContent = message;
+            if (isError) {
+                header.className = "flex items-center gap-3 text-rxDanger mb-3";
+                header.querySelector('span').textContent = "warning";
+            } else {
+                header.className = "flex items-center gap-3 text-rxSuccess mb-3";
+                header.querySelector('span').textContent = "check_circle";
+            }
+            header.querySelector('h4').textContent = title;
+            modal.classList.remove('hidden');
+        }
+
+        document.getElementById('btnRxModalClose').addEventListener('click', () => {
+            document.getElementById('rxModal').classList.add('hidden');
+        });
+
+        // Load Sample Case Trigger
+        document.getElementById('btnLoadSample').addEventListener('click', () => {
+            document.getElementById('in-dept').value = "Adult Psychiatry";
+            document.getElementById('in-type').value = "Initial Assessment";
+            document.getElementById('in-priority').value = "Routine";
+            document.getElementById('in-pat-name').value = "John Doe";
+            document.getElementById('in-pat-dob').value = "2000-01-01";
+            document.getElementById('in-pat-id').value = "ABCD1234567890";
+            document.getElementById('in-doc-name').value = "dr. Ammabel L Kalux";
+            document.getElementById('in-complaint').value = "Sulit tidur, mudah lelah, sering merasa sedih.";
+            document.getElementById('in-anamnesis').value = "Pasien mengeluh sulit tidur hampir setiap malam selama 2 minggu terakhir, mudah menangis tanpa alasan jelas, kehilangan minat pada aktivitas yang biasa disukai, nafsu makan menurun, sulit berkonsentrasi. Diagnosis kerja: Suspek Depresi.";
+            
+            checkFormValidity();
+            showNotification("Sampel John Doe Dimuat", "Seluruh data klinis model John Doe berhasil dimasukkan ke form.", false);
+        });
+
+        const API_KEY = ""; // Dynamic key provisioning
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${API_KEY}`;
+
+        async function fetchWithBackoff(url, payload, retries = 3, delay = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (response.ok) return await response.json();
+                } catch (err) {
+                    if (i === retries - 1) throw err;
+                }
+                await new Promise(res => setTimeout(res, delay * Math.pow(2, i)));
+            }
+        }
+
+        document.getElementById('btnMulai').addEventListener('click', async () => {
+            if (isInterviewActive) return;
+
+            const btnMulai = document.getElementById('btnMulai');
+            const resultsArea = document.getElementById('resultsArea');
+            
+            btnMulai.disabled = true;
+            btnMulai.innerHTML = '<div class="loader"></div> Menginisialisasi Model Psikiatrik...';
+
+            try {
+                // Instantiating initial state
+                currentTurn = 1;
+                chatHistory = [];
+                isCompleted = false;
+                document.getElementById('chatWindow').innerHTML = "";
+                
+                // Show dynamic content grid and focus scroll
+                resultsArea.classList.remove('hidden');
+                resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                // Set initial skeleton loaders
+                renderSkeletons();
+
+                // Build initial clinical reasoning parameters
+                const dept = document.getElementById('in-dept').value;
+                const type = document.getElementById('in-type').value;
+                const priority = document.getElementById('in-priority').value;
+                const patName = document.getElementById('in-pat-name').value;
+                const docName = document.getElementById('in-doc-name').value;
+                const complaint = document.getElementById('in-complaint').value;
+                const anamnesis = document.getElementById('in-anamnesis').value;
+
+                const systemPrompt = `Anda adalah Dokter Spesialis Psikiatri Konsultan Senior di Roxwood Hospital.
+Anda bertugas melakukan asesmen psikiatri profesional menggunakan pendekatan evidence-based psychiatry. Clinical Information merupakan sumber utama clinical reasoning.
+
+PROSES KERJA:
+1. Analisis seluruh clinical information yang dimasukkan.
+2. Buat awal clinical impressions (kemungkinan diagnosis) beserta persen probabilitasnya.
+3. Hasilkan PERTANYAAN PERTAMA wawancara klinis yang tajam untuk mengevaluasi keluhan secara dinamis.
+
+ATURAN UTAMA:
+- Gunakan Bahasa Indonesia formal dan terminologi medis psikiatri baku. Jangan menggunakan bahasa percakapan.
+- Output harus menyerupai dokumentasi psikiater di rumah sakit modern.
+- AI HANYA mengajukan SATU pertanyaan dalam satu waktu.
+- Jangan membuat pertanyaan yang berulang.
+- Jangan pernah langsung memberikan diagnosis di tengah interview.
+- Output WAJIB berformat JSON yang valid sesuai dengan skema yang diminta.`;
+
+                const userPrompt = `Data Klinis Awal:
+- Departemen: ${dept}
+- Tipe Evaluasi: ${type}
+- Prioritas: ${priority}
+- Nama Pasien: ${patName}
+- Dokter Pengirim: ${docName}
+- Keluhan Utama: ${complaint}
+- Anamnesis / Diagnosis Kerja: ${anamnesis}
+
+Berikan output JSON berupa diagnosis awal dan pertanyaan pertama untuk wawancara klinis.`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userPrompt }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                "clinicalImpressions": {
+                                    "type": "ARRAY",
+                                    "items": {
+                                        "type": "OBJECT",
+                                        "properties": {
+                                            "condition": { "type": "STRING" },
+                                            "probability": { "type": "NUMBER" }
+                                        },
+                                        "required": ["condition", "probability"]
+                                    }
+                                },
+                                "firstQuestion": { "type": "STRING", "description": "Satu pertanyaan klinis pertama psikiatris untuk pasien." }
+                            },
+                            "required": ["clinicalImpressions", "firstQuestion"]
+                        }
+                    }
+                };
+
+                const result = await fetchWithBackoff(API_URL, payload);
+                if (result.candidates && result.candidates[0].content) {
+                    const data = JSON.parse(result.candidates[0].content.parts[0].text);
+                    
+                    // Render first response
+                    renderImpressions(data.clinicalImpressions);
+                    appendChatBubble("AI", data.firstQuestion);
+
+                    // Add to conversational context
+                    chatHistory.push({ role: "model", text: data.firstQuestion });
+
+                    // Set clinical interface controls active
+                    isInterviewActive = true;
+                    document.getElementById('in-patient-reply').disabled = false;
+                    document.getElementById('btnNextQuestion').disabled = false;
+                    document.getElementById('btnSkipInterview').disabled = false;
+                    document.getElementById('interviewProgressBadge').textContent = `Pertanyaan 1 / ${totalTurns}`;
+                }
+
+            } catch (e) {
+                console.error(e);
+                showNotification("Gagal Terhubung", "Koneksi ke sistem AI terputus. Silakan coba lagi.");
+            } finally {
+                btnMulai.disabled = false;
+                btnMulai.innerHTML = '<span class="material-symbols-rounded">neurology</span> Mulai Assessment';
+            }
+        });
+
+        function renderSkeletons() {
+            const mse = document.getElementById('out-mse');
+            const diagnosisBox = document.getElementById('out-diag-primary-box');
+            const diffBox = document.getElementById('out-diag-diff');
+            const riskBox = document.getElementById('out-risk');
+            const planBox = document.getElementById('out-plan');
+            const medsBox = document.getElementById('out-meds');
+
+            mse.innerHTML = Array(12).fill(0).map(() => `
+                <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+                    <div class="h-4 w-1/3 skeleton"></div>
+                    <div class="h-4 w-1/2 skeleton"></div>
+                </div>
+            `).join('');
+
+            diagnosisBox.innerHTML = `<div class="h-8 w-full skeleton"></div>`;
+            diffBox.innerHTML = Array(3).fill(0).map(() => `<li class="h-3 w-3/4 skeleton mb-2 list-none"></li>`).join('');
+            
+            riskBox.innerHTML = Array(4).fill(0).map(() => `
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                    <div class="h-3 w-1/4 skeleton"></div>
+                    <div class="h-3 w-1/6 skeleton"></div>
+                </div>
+            `).join('');
+
+            planBox.innerHTML = Array(4).fill(0).map(() => `<li class="h-3 w-full skeleton mb-2 list-none"></li>`).join('');
+
+            medsBox.innerHTML = Array(2).fill(0).map(() => `
+                <tr class="border-b border-gray-50">
+                    <td class="py-2"><div class="h-3 w-12 skeleton"></div></td>
+                    <td class="py-2"><div class="h-3 w-10 skeleton"></div></td>
+                    <td class="py-2"><div class="h-3 w-12 skeleton"></div></td>
+                    <td class="py-2"><div class="h-3 w-10 skeleton"></div></td>
+                </tr>
+            `).join('');
+        }
+
+        // Quick Reply Button logic
+        function quickReply(text) {
+            const textfield = document.getElementById('in-patient-reply');
+            if (textfield.disabled) return;
+            textfield.value = text;
+            textfield.focus();
+        }
+
+        function appendChatBubble(sender, text) {
+            const chatWindow = document.getElementById('chatWindow');
+            const isAI = sender === "AI";
+            
+            const bubble = document.createElement('div');
+            bubble.className = `flex flex-col ${isAI ? 'items-start' : 'items-end'} w-full animate-fade-in`;
+            
+            bubble.innerHTML = `
+                <div class="flex items-center gap-1.5 mb-1 text-[9px] font-bold text-rxTextSub uppercase tracking-wider">
+                    ${isAI ? '<span class="bg-rxPrimary text-white px-1.5 py-0.5 rounded text-[8px] tracking-normal">AI</span> Roxwood Specialist' : '<span class="bg-slate-400 text-white px-1.5 py-0.5 rounded text-[8px] tracking-normal">Pasien</span> Jawaban'}
+                </div>
+                <div class="${isAI ? 'bg-rxSecondary text-rxTextMain rounded-tr-2xl rounded-bl-2xl rounded-br-2xl' : 'bg-slate-100 text-rxTextMain rounded-tl-2xl rounded-bl-2xl rounded-br-2xl'} p-3.5 max-w-[85%] leading-relaxed shadow-sm border border-black/5">
+                    ${text}
+                </div>
+            `;
+            
+            chatWindow.appendChild(bubble);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function renderImpressions(impressions) {
+            const container = document.getElementById('out-impression');
+            if (!impressions || impressions.length === 0) {
+                container.innerHTML = `<p class="text-rxTextSub text-xs italic">Belum teranalisis</p>`;
+                return;
+            }
+
+            const sorted = [...impressions].sort((a,b) => b.probability - a.probability);
+            container.innerHTML = sorted.map(imp => `
+                <div class="mb-3.5">
+                    <div class="flex justify-between text-[11px] mb-1">
+                        <span class="font-bold text-rxTextMain">${imp.condition}</span>
+                        <span class="font-extrabold text-rxPrimary">${imp.probability}%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2">
+                        <div class="bg-rxPrimary h-2 rounded-full transition-all duration-500" style="width: ${imp.probability}%"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('btnNextQuestion').addEventListener('click', async () => {
+            const replyInput = document.getElementById('in-patient-reply');
+            const replyText = replyInput.value.trim();
+            if (!replyText) {
+                showNotification("Input Kosong", "Masukkan respons klinis atau gunakan tombol opsi cepat.");
+                return;
+            }
+
+            appendChatBubble("Pasien", replyText);
+            chatHistory.push({ role: "user", text: replyText });
+            replyInput.value = "";
+
+            currentTurn++;
+
+            if (currentTurn > totalTurns) {
+                await processFinalDiagnosis();
+            } else {
+                await getNextQuestion();
+            }
+        });
+
+        // Quick analysis trigger
+        document.getElementById('btnSkipInterview').addEventListener('click', async () => {
+            await processFinalDiagnosis(true);
+        });
+
+        async function getNextQuestion() {
+            const btnNext = document.getElementById('btnNextQuestion');
+            const replyInput = document.getElementById('in-patient-reply');
+
+            btnNext.disabled = true;
+            replyInput.disabled = true;
+            btnNext.innerHTML = '<div class="loader"></div> Mengolah Jawaban...';
+
+            try {
+                const systemPrompt = `Anda adalah Dokter Spesialis Psikiatri Konsultan Senior di Roxwood Hospital.
+Anda sedang memimpin wawancara klinis terstruktur. Clinical Information merupakan sumber utama clinical reasoning.
+Tugas Anda adalah menganalisis respons terbaru pasien, memperbarui kemungkinan diagnosis banding, dan merumuskan SATU pertanyaan klinis lanjutan secara dinamis.
+
+ATURAN UTAMA:
+- Gunakan Bahasa Indonesia formal dan terminologi medis psikiatri baku. Jangan menggunakan bahasa percakapan.
+- HANYA ajukan SATU pertanyaan saja.
+- Jangan membuat pertanyaan yang berulang.
+- Pertanyaan berikutnya harus selalu mempertimbangkan jawaban sebelumnya.
+- Probability diagnosis harus diperbarui secara akurat setelah setiap jawaban.
+- Jangan sebutkan diagnosa spesifik secara langsung kepada pasien.
+- Format output wajib berupa JSON terstruktur menyerupai dokumentasi psikiater di rumah sakit modern.`;
+
+                const dialogContext = chatHistory.map(h => `${h.role === 'model' ? 'AI: ' : 'Pasien: '}${h.text}`).join('\n');
+                const userPrompt = `Riwayat Interview:\n${dialogContext}\n\nAnalisis dan buat pertanyaan lanjutan (Pertanyaan ke-${currentTurn} dari ${totalTurns}) dalam bentuk JSON.`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userPrompt }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                "clinicalImpressions": {
+                                    "type": "ARRAY",
+                                    "items": {
+                                        "type": "OBJECT",
+                                        "properties": {
+                                            "condition": { "type": "STRING" },
+                                            "probability": { "type": "NUMBER" }
+                                        },
+                                        "required": ["condition", "probability"]
+                                    }
+                                },
+                                "nextQuestion": { "type": "STRING" }
+                            },
+                            "required": ["clinicalImpressions", "nextQuestion"]
+                        }
+                    }
+                };
+
+                const result = await fetchWithBackoff(API_URL, payload);
+                if (result.candidates && result.candidates[0].content) {
+                    const data = JSON.parse(result.candidates[0].content.parts[0].text);
+                    
+                    renderImpressions(data.clinicalImpressions);
+                    appendChatBubble("AI", data.nextQuestion);
+                    
+                    chatHistory.push({ role: "model", text: data.nextQuestion });
+                    
+                    document.getElementById('interviewProgressBadge').textContent = `Pertanyaan ${currentTurn} / ${totalTurns}`;
+                    
+                    if (currentTurn === totalTurns) {
+                        btnNext.innerHTML = '<span>Tegakkan Diagnosis Akhir</span><span class="material-symbols-rounded text-sm">assignment_turned_in</span>';
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                showNotification("Gagal Mengolah", "Gagal menghubungi mesin analisis psikiatrik.");
+            } finally {
+                btnNext.disabled = false;
+                replyInput.disabled = false;
+                if (currentTurn < totalTurns) {
+                    btnNext.innerHTML = '<span>Lanjutkan Pertanyaan</span><span class="material-symbols-rounded text-sm">arrow_forward</span>';
+                }
+            }
+        }
+
+        async function processFinalDiagnosis(skipped = false) {
+            const btnNext = document.getElementById('btnNextQuestion');
+            const btnSkip = document.getElementById('btnSkipInterview');
+            const replyInput = document.getElementById('in-patient-reply');
+
+            btnNext.disabled = true;
+            btnSkip.disabled = true;
+            replyInput.disabled = true;
+            btnNext.innerHTML = '<div class="loader"></div> Menyusun Rekam Medis...';
+
+            try {
+                const dept = document.getElementById('in-dept').value;
+                const type = document.getElementById('in-type').value;
+                const priority = document.getElementById('in-priority').value;
+                const patName = document.getElementById('in-pat-name').value;
+                const patDob = document.getElementById('in-pat-dob').value;
+                const patId = document.getElementById('in-pat-id').value;
+                const docName = document.getElementById('in-doc-name').value;
+                const complaint = document.getElementById('in-complaint').value;
+                const anamnesis = document.getElementById('in-anamnesis').value;
+
+                const systemPrompt = `Anda adalah Dokter Spesialis Psikiatri Konsultan Senior di Roxwood Hospital.
+Berdasarkan keluhan utama, anamnesis klinis awal, serta dialog interaktif tambahan, buatlah laporan diagnosis psikiatri formal yang valid, kredibel, dan komprehensif. Clinical Information merupakan sumber utama clinical reasoning.
+
+ATURAN KLINIS:
+1. Tegakkan diagnosis utama sesuai kriteria DSM-5 / ICD-10 lengkap dengan kodenya (e.g., F32.1).
+2. Isi tabel Pemeriksaan Status Mental (MSE) lengkap (12 parameter wajib).
+3. Berikan penilaian tingkat keparahan (Severity) dan risiko (Suicide, Violence, Self Harm).
+4. Buat Treatment Plan lengkap non-farmakologi.
+5. Rekomendasikan farmakoterapi spesifik jika diindikasikan (atau beri penjelasan klinis jika tidak perlu).
+
+ATURAN KETAT:
+- Gunakan Bahasa Indonesia formal dan terminologi medis psikiatri baku. Jangan menggunakan bahasa percakapan.
+- Output harus menyerupai dokumentasi psikiater di rumah sakit modern.
+- Jangan membuat diagnosis yang bertentangan dengan hasil interview.
+- Mental Status Examination (MSE) harus konsisten dengan hasil interview.
+- Diagnosis harus konsisten dengan anamnesis, hasil interview, dan MSE.
+- Treatment Plan harus sesuai dengan diagnosis.
+- Medication Recommendation harus sesuai guideline psikiatri dan diagnosis yang telah ditegakkan.`;
+
+                const dialogContext = chatHistory.map(h => `${h.role === 'model' ? 'AI: ' : 'Pasien: '}${h.text}`).join('\n');
+                const userPrompt = `
+RIWAYAT PEMERIKSAAN KELUHAN:
+- Nama Pasien: ${patName} (DOB: ${patDob}, NIK: ${patId})
+- Keluhan Utama: ${complaint}
+- Riwayat Temuan Klinis: ${anamnesis}
+
+DINAMIKA DIALOG INTERVIEW:
+${dialogContext}
+${skipped ? "\n(Wawancara klinis dipersingkat oleh praktisi medis, lakukan integrasi berdasarkan data objektif parsial.)" : ""}
+
+Kembalikan hasil evaluasi lengkap dalam bentuk JSON terstruktur.`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userPrompt }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                "clinicalImpressions": {
+                                    "type": "ARRAY",
+                                    "items": {
+                                        "type": "OBJECT",
+                                        "properties": {
+                                            "condition": { "type": "STRING" },
+                                            "probability": { "type": "NUMBER" }
+                                        },
+                                        "required": ["condition", "probability"]
+                                    }
+                                },
+                                "mse": {
+                                    "type": "OBJECT",
+                                    "properties": {
+                                        "appearance": { "type": "STRING" },
+                                        "behavior": { "type": "STRING" },
+                                        "speech": { "type": "STRING" },
+                                        "mood": { "type": "STRING" },
+                                        "affect": { "type": "STRING" },
+                                        "thoughtProcess": { "type": "STRING" },
+                                        "thoughtContent": { "type": "STRING" },
+                                        "perception": { "type": "STRING" },
+                                        "insight": { "type": "STRING" },
+                                        "judgment": { "type": "STRING" },
+                                        "cognition": { "type": "STRING" },
+                                        "orientation": { "type": "STRING" }
+                                    },
+                                    "required": ["appearance", "behavior", "speech", "mood", "affect", "thoughtProcess", "thoughtContent", "perception", "insight", "judgment", "cognition", "orientation"]
+                                },
+                                "diagnosis": {
+                                    "type": "OBJECT",
+                                    "properties": {
+                                        "code": { "type": "STRING" },
+                                        "primary": { "type": "STRING" },
+                                        "differential": {
+                                            "type": "ARRAY",
+                                            "items": { "type": "STRING" }
+                                        }
+                                    },
+                                    "required": ["code", "primary", "differential"]
+                                },
+                                "riskAssessment": {
+                                    "type": "OBJECT",
+                                    "properties": {
+                                        "severity": { "type": "STRING" },
+                                        "suicideRisk": { "type": "STRING" },
+                                        "violenceRisk": { "type": "STRING" },
+                                        "selfHarmRisk": { "type": "STRING" }
+                                    },
+                                    "required": ["severity", "suicideRisk", "violenceRisk", "selfHarmRisk"]
+                                },
+                                "treatmentPlan": {
+                                    "type": "ARRAY",
+                                    "items": { "type": "STRING" }
+                                },
+                                "medications": {
+                                    "type": "ARRAY",
+                                    "items": {
+                                        "type": "OBJECT",
+                                        "properties": {
+                                            "name": { "type": "STRING" },
+                                            "dose": { "type": "STRING" },
+                                            "frequency": { "type": "STRING" },
+                                            "duration": { "type": "STRING" },
+                                            "monitoring": { "type": "STRING" }
+                                        },
+                                        "required": ["name", "dose", "frequency", "duration", "monitoring"]
+                                    }
+                                },
+                                "clinicalSummary": { "type": "STRING" }
+                            },
+                            "required": ["clinicalImpressions", "mse", "diagnosis", "riskAssessment", "treatmentPlan", "medications", "clinicalSummary"]
+                        }
+                    }
+                };
+
+                const result = await fetchWithBackoff(API_URL, payload);
+                if (result.candidates && result.candidates[0].content) {
+                    const finalData = JSON.parse(result.candidates[0].content.parts[0].text);
+                    
+                    // Render final structures
+                    renderImpressions(finalData.clinicalImpressions);
+                    renderMSE(finalData.mse);
+                    renderDiagnoses(finalData.diagnosis);
+                    renderRisks(finalData.riskAssessment);
+                    renderTreatments(finalData.treatmentPlan);
+                    renderMedications(finalData.medications);
+                    renderDocumentPrint(finalData);
+
+                    appendChatBubble("AI", "Wawancara selesai. Seluruh asesmen psikiatrik, pemeriksaan status mental (MSE), analisis risiko, serta rekomendasi rekam medis resmi telah divalidasi dan siap diterbitkan.");
+                    
+                    isCompleted = true;
+                    document.getElementById('interviewProgressBadge').textContent = "Asesmen Selesai";
+                    document.getElementById('btnPrintReport').disabled = false;
+                    
+                    showNotification("Selesai", "Laporan Rekam Medis & Diagnosis Psikiatri berhasil ditegakkan.", false);
+                }
+
+            } catch (err) {
+                console.error(err);
+                showNotification("Gagal", "Tidak dapat merumuskan diagnosis akhir secara tepat.");
+            } finally {
+                btnNext.disabled = true;
+                btnSkip.disabled = true;
+                replyInput.disabled = true;
+                btnNext.innerHTML = '<span>Lanjutkan Pertanyaan</span><span class="material-symbols-rounded text-sm">arrow_forward</span>';
+            }
+        }
+
+        function renderMSE(mse) {
+            const container = document.getElementById('out-mse');
+            const icons = {
+                appearance: 'person', behavior: 'groups', speech: 'record_voice_over', mood: 'sentiment_satisfied',
+                affect: 'face', thoughtProcess: 'account_tree', thoughtContent: 'electric_bolt', perception: 'visibility',
+                insight: 'lightbulb', judgment: 'gavel', cognition: 'psychology', orientation: 'explore'
+            };
+
+            container.innerHTML = Object.entries(mse).map(([key, val]) => {
+                const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                return `
+                    <div class="flex items-center justify-between border-b border-gray-100 pb-2 last:border-0">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-rounded text-rxPrimary text-base">${icons[key] || 'info'}</span>
+                            <span class="text-[11px] font-semibold text-rxTextMain">${label}</span>
+                        </div>
+                        <span class="text-[11px] text-rxTextSub font-semibold text-right max-w-[65%]">${val}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderDiagnoses(diag) {
+            const box = document.getElementById('out-diag-primary-box');
+            const diffList = document.getElementById('out-diag-diff');
+
+            box.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="font-extrabold text-rxPrimary bg-rxSecondary px-2.5 py-1 rounded-lg text-xs">${diag.code}</span>
+                    <span class="font-bold text-rxTextMain text-xs">${diag.primary}</span>
+                </div>
+            `;
+
+            diffList.innerHTML = diag.differential.map(d => `
+                <li class="text-xs text-rxTextMain mb-1">${d}</li>
+            `).join('');
+        }
+
+        function renderRisks(risk) {
+            const container = document.getElementById('out-risk');
+            
+            function getDot(val) {
+                const str = (val || '').toLowerCase();
+                if (str.includes('low')) return 'dot-low';
+                if (str.includes('mod')) return 'dot-mod';
+                if (str.includes('high') || str.includes('sev')) return 'dot-high';
+                return 'bg-slate-400';
+            }
+
+            const items = [
+                { label: 'Severity Level', val: risk.severity },
+                { label: 'Suicide Risk', val: risk.suicideRisk },
+                { label: 'Violence Risk', val: risk.violenceRisk },
+                { label: 'Self Harm Risk', val: risk.selfHarmRisk }
+            ];
+
+            container.innerHTML = items.map(item => `
+                <div class="flex justify-between items-center py-2.5 border-b border-gray-100 last:border-0">
+                    <span class="text-xs font-semibold text-rxTextMain">${item.label}</span>
+                    <div class="flex items-center gap-2">
+                        <span class="dot ${getDot(item.val)}"></span>
+                        <span class="text-xs text-rxTextSub font-bold">${item.val}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderTreatments(plan) {
+            const container = document.getElementById('out-plan');
+            container.innerHTML = plan.map(p => `<li class="text-xs text-rxTextMain leading-relaxed mb-1">${p}</li>`).join('');
+        }
+
+        function renderMedications(meds) {
+            const container = document.getElementById('out-meds');
+            if (!meds || meds.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="py-10 text-center text-rxTextSub italic text-xs">Farmakoterapi tidak direkomendasikan saat ini.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            container.innerHTML = meds.map(m => `
+                <tr class="border-b border-gray-50 last:border-0">
+                    <td class="py-2.5 font-bold text-xs text-rxTextMain">${m.name}</td>
+                    <td class="py-2.5 text-xs text-rxTextSub">${m.dose}</td>
+                    <td class="py-2.5 text-xs text-rxTextSub">${m.frequency}</td>
+                    <td class="py-2.5 text-xs text-rxTextSub">${m.duration}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderDocumentPrint(data) {
+            const fullDate = document.getElementById('currentDate').textContent + " " + document.getElementById('currentTime').textContent;
+            
+            // Update Mini Preview UI
+            document.getElementById('prev-name').textContent = document.getElementById('in-pat-name').value || "-";
+            document.getElementById('prev-doctor').textContent = document.getElementById('in-doc-name').value || "-";
+            document.getElementById('prev-dob').textContent = document.getElementById('in-pat-dob').value || "-";
+            document.getElementById('prev-dept').textContent = document.getElementById('in-dept').value || "-";
+            document.getElementById('prev-id').textContent = document.getElementById('in-pat-id').value || "-";
+            document.getElementById('prev-date').textContent = fullDate;
+            
+            // Complete Preview Fields
+            const complaint = document.getElementById('in-complaint').value;
+            const anamnesis = document.getElementById('in-anamnesis').value;
+            document.getElementById('prev-anamnesis').textContent = `KU: ${complaint} | Anamnesis: ${anamnesis}`;
+            
+            document.getElementById('prev-diagnosis').textContent = `[${data.diagnosis.code}] ${data.diagnosis.primary}`;
+            document.getElementById('prev-risk').textContent = `Sev: ${data.riskAssessment.severity} | Suicide: ${data.riskAssessment.suicideRisk} | Violence: ${data.riskAssessment.violenceRisk}`;
+            document.getElementById('prev-clinical-summary').textContent = data.clinicalSummary;
+            
+            const terapiList = data.treatmentPlan.map(t => `<li>${t}</li>`).join('');
+            document.getElementById('prev-terapi').innerHTML = terapiList || "<li>Tidak ada rekomendasi spesifik.</li>";
+            
+            const medsList = (data.medications && data.medications.length > 0) 
+                ? data.medications.map(m => `${m.name} ${m.dose} (${m.frequency})`).join(', ') 
+                : "Tidak ada indikasi farmakoterapi.";
+            document.getElementById('prev-meds').textContent = medsList;
+
+            document.getElementById('prev-signature').textContent = document.getElementById('in-doc-name').value || "-";
+            document.getElementById('prev-doctor-sign-name').textContent = document.getElementById('in-doc-name').value || "-";
+
+            // Update Full Print Layout Data
+            document.getElementById('lbl-rep-pat-name').textContent = document.getElementById('in-pat-name').value;
+            document.getElementById('lbl-rep-pat-dob').textContent = document.getElementById('in-pat-dob').value;
+            document.getElementById('lbl-rep-pat-id').textContent = document.getElementById('in-pat-id').value;
+            document.getElementById('lbl-rep-doc').textContent = document.getElementById('in-doc-name').value;
+            document.getElementById('lbl-rep-date').textContent = fullDate;
+            document.getElementById('lbl-rep-dept').textContent = document.getElementById('in-dept').value;
+
+            const printDetailed = document.getElementById('print-detailed-content');
+
+            let rawMedsRows = (data.medications || []).map(m => `
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #E2E8F0; font-weight: bold;">${m.name}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #E2E8F0;">${m.dose}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #E2E8F0;">${m.frequency}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #E2E8F0;">${m.duration}</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #E2E8F0; font-size: 9px; color: #2F7A78;">${m.monitoring}</td>
+                </tr>
+            `).join('');
+
+            if (!rawMedsRows) {
+                rawMedsRows = `<tr><td colspan="5" style="padding: 10px; text-align: center; color: #6B7280; font-style: italic;">Tidak ada indikasi farmakoterapi saat ini.</td></tr>`;
+            }
+
+            printDetailed.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 8px 0; color: #2F7A78; font-size: 11px; font-weight: bold; border-bottom: 1px solid #E3E7EA; padding-bottom: 4px; text-transform: uppercase;">A. KELUHAN UTAMA & ANAMNESIS</h4>
+                    <p style="margin: 0; font-style: italic; color: #4A5568;">Keluhan Utama: ${document.getElementById('in-complaint').value}</p>
+                    <p style="margin: 6px 0 0 0;">Anamnesis: ${document.getElementById('in-anamnesis').value}</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <h4 style="margin: 0 0 8px 0; color: #2F7A78; font-size: 11px; font-weight: bold; border-bottom: 1px solid #E3E7EA; padding-bottom: 4px; text-transform: uppercase;">B. DIAGNOSIS (DSM-5 / ICD-10)</h4>
+                        <div style="background-color: #EAF7F6; padding: 10px; border-radius: 6px; margin-bottom: 8px; border-left: 4px solid #2F7A78;">
+                            <strong style="font-size: 11px; color: #2D3748;">[${data.diagnosis.code}] ${data.diagnosis.primary}</strong>
+                        </div>
+                        <span style="font-size: 9px; font-weight: bold; color: #6B7280; text-transform: uppercase; display: block; margin-bottom: 4px;">Diagnosis Banding:</span>
+                        <ul style="margin: 0; padding-left: 15px; color: #4A5568;">
+                            ${data.diagnosis.differential.map(d => `<li>${d}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="margin: 0 0 8px 0; color: #2F7A78; font-size: 11px; font-weight: bold; border-bottom: 1px solid #E3E7EA; padding-bottom: 4px; text-transform: uppercase;">C. TINGKAT KEPARAHAN & RISIKO</h4>
+                        <table style="width: 100%; font-size: 10px;">
+                            <tr><td style="padding: 3px 0; font-weight: bold; color: #6B7280;">Severity Global:</td><td style="padding: 3px 0; text-align: right; font-weight: bold;">${data.riskAssessment.severity}</td></tr>
+                            <tr><td style="padding: 3px 0; font-weight: bold; color: #6B7280;">Suicide Risk:</td><td style="padding: 3px 0; text-align: right; font-weight: bold;">${data.riskAssessment.suicideRisk}</td></tr>
+                            <tr><td style="padding: 3px 0; font-weight: bold; color: #6B7280;">Violence Risk:</td><td style="padding: 3px 0; text-align: right; font-weight: bold;">${data.riskAssessment.violenceRisk}</td></tr>
+                            <tr><td style="padding: 3px 0; font-weight: bold; color: #6B7280;">Self Harm Risk:</td><td style="padding: 3px 0; text-align: right; font-weight: bold;">${data.riskAssessment.selfHarmRisk}</td></tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 8px 0; color: #2F7A78; font-size: 11px; font-weight: bold; border-bottom: 1px solid #E3E7EA; padding-bottom: 4px; text-transform: uppercase;">D. KESIMPULAN KLINIS</h4>
+                    <p style="margin: 0; background-color: #F8FAFB; padding: 12px; border-radius: 8px; border: 1px dashed #E3E7EA;">${data.clinicalSummary}</p>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 8px 0; color: #2F7A78; font-size: 11px; font-weight: bold; border-bottom: 1px solid #E3E7EA; padding-bottom: 4px; text-transform: uppercase;">E. REKOMENDASI TERAPI & PENATALAKSANAAN</h4>
+                    <div style="margin-bottom: 10px;">
+                        <span style="font-size: 9px; font-weight: bold; color: #6B7280; text-transform: uppercase;">Terapi Non-Farmakologi:</span>
+                        <ul style="margin: 4px 0 0 0; padding-left: 15px;">
+                            ${data.treatmentPlan.map(t => `<li>${t}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <span style="font-size: 9px; font-weight: bold; color: #6B7280; text-transform: uppercase; display: block; margin-bottom: 6px;">Rencana Farmakoterapi:</span>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 10px; text-align: left;">
+                        <thead>
+                            <tr style="background-color: #F8FAFB; border-bottom: 1px solid #E2E8F0;">
+                                <th style="padding: 6px; font-weight: bold;">Medikasi</th>
+                                <th style="padding: 6px; font-weight: bold;">Dosis</th>
+                                <th style="padding: 6px; font-weight: bold;">Frekuensi</th>
+                                <th style="padding: 6px; font-weight: bold;">Durasi</th>
+                                <th style="padding: 6px; font-weight: bold;">Rencana Pemantauan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rawMedsRows}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 40px; padding-top: 20px; border-top: 1px dashed #E3E7EA;">
+                    <div style="font-size: 8px; color: #A0AEC0; max-width: 60%; line-height: 1.5;">
+                        Laporan ini dibuat menggunakan AI untuk keperluan roleplay dan bukan merupakan diagnosis profesional. Jika Anda memiliki gejala atau kekhawatiran terkait kesehatan mental, segera cari bantuan dari tenaga profesional.
+                    </div>
+                    <div style="text-align: center;">
+                        <p style="margin: 0 0 5px 0; font-size: 9px; color: #6B7280;">Dokter Spesialis Pemeriksa,</p>
+                        <div style="font-family: 'Caveat', cursive; font-size: 32px; font-weight: 700; color: #2F7A78; transform: rotate(-5deg); margin: 10px 0;">${document.getElementById('in-doc-name').value}</div>
+                        <p style="margin: 0; font-weight: bold; text-decoration: underline; color: #2D3748;">${document.getElementById('in-doc-name').value}</p>
+                        <p style="margin: 2px 0 0 0; font-size: 8px; color: #6B7280;"> </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        document.getElementById('btnPrintReport').addEventListener('click', () => {
+            if (!isCompleted) return;
+            const printContent = document.getElementById('print-area').innerHTML;
+
+            const printWindow = window.open('', '', 'height=800,width=1000');
+            printWindow.document.write('<html><head><title>Print Rekam Medis - Roxwood Psychiatry CDSS</title>');
+            
+            // Safe DOM insertion to prevent outer script parse error (closes the syntax bug!)
+            const style = printWindow.document.createElement('style');
+            style.textContent = `
+                @page { margin: 0; }
+                body { font-family: "Inter", sans-serif; background-color: #fff; color: #2d3748; padding: 20px; }
+                @media print { body { padding: 20mm; } }
+            `;
+            printWindow.document.head.appendChild(style);
+
+            // Adding Font for Signature
+            const fontLink = printWindow.document.createElement('link');
+            fontLink.href = "https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Inter:wght@400;600;700&display=swap";
+            fontLink.rel = "stylesheet";
+            printWindow.document.head.appendChild(fontLink);
+
+            // Adding Tailwind compilation stylesheet
+            const tailwindLink = printWindow.document.createElement('script');
+            tailwindLink.src = "https://cdn.tailwindcss.com";
+            printWindow.document.head.appendChild(tailwindLink);
+
+            printWindow.document.write('</head><body>');
+            printWindow.document.write(printContent);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            
+            // Wait slightly for resources compilation
+            setTimeout(() => {
+                printWindow.focus();
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

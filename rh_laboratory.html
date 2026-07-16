@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roxwood Hospital LIS</title>
+    
+    <!-- Google Fonts: Poppins (UI) & Caveat (Tanda Tangan) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons untuk icon modern -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bgMain: '#F7F7F8',
+                        cardBg: '#FFFFFF',
+                        primary: '#F48FB1',
+                        primaryHover: '#EC407A',
+                        borderMain: '#E5E7EB',
+                        textMain: '#374151',
+                        textSec: '#6B7280',
+                        success: '#4CAF50',
+                        danger: '#EF4444',
+                        warning: '#F59E0B'
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        signature: ['Caveat', 'cursive']
+                    },
+                    borderRadius: {
+                        'xl': '18px',
+                    },
+                    boxShadow: {
+                        'soft': '0 8px 24px rgba(0,0,0,.06)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F7F7F8;
+            color: #374151;
+            font-family: 'Poppins', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8; 
+        }
+
+        /* Input styling */
+        .input-field {
+            @apply w-full px-4 py-3 rounded-xl border border-borderMain bg-white text-textMain focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-250 ease-in-out font-medium text-sm;
+        }
+        .input-field::placeholder {
+            @apply text-gray-400 font-normal;
+        }
+        
+        /* Card transition */
+        .hover-card {
+            @apply transition-all duration-250 ease-in-out hover:-translate-y-1 hover:shadow-lg;
+        }
+
+        /* Submit Button States */
+        #analyzeBtn:disabled {
+            @apply bg-pink-100 text-pink-300 cursor-not-allowed shadow-none;
+        }
+        #analyzeBtn:not(:disabled) {
+            @apply bg-primary text-white hover:bg-primaryHover shadow-md hover:shadow-lg cursor-pointer transform hover:-translate-y-0.5;
+        }
+
+        /* Custom Checkbox */
+        .custom-checkbox {
+            @apply w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary focus:ring-2 accent-primary cursor-pointer;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen">
+
+    <div class="max-w-[1400px] mx-auto space-y-8">
+        
+        <!-- HEADER -->
+        <header class="flex flex-col md:flex-row justify-between items-center bg-cardBg p-6 rounded-xl shadow-soft">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 bg-pink-50 rounded-full flex items-center justify-center text-primary">
+                    <i class="ph-fill ph-flask text-3xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight text-primaryHover">ROXWOOD HOSPITAL</h1>
+                    <p class="text-sm font-semibold tracking-widest text-textSec">LABORATORY CENTER</p>
+                </div>
+            </div>
+            <div class="text-center md:text-right mt-4 md:mt-0">
+                <p class="text-sm font-medium text-textSec mb-2">Laboratory Testing & Clinical Analysis System</p>
+                <div class="inline-flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg border border-borderMain">
+                    <i class="ph ph-calendar-blank text-textSec"></i>
+                    <span id="currentDateTime" class="text-sm font-medium">--</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- SECTION 1: INPUT DATA -->
+        <section class="bg-cardBg rounded-xl shadow-soft p-6 border border-borderMain/50">
+            <div class="flex items-center gap-3 mb-6 border-b border-borderMain pb-4">
+                <i class="ph ph-file-text text-2xl text-primary"></i>
+                <h2 class="text-xl font-bold text-primaryHover">1. INPUT DATA</h2>
+            </div>
+
+            <form id="labForm" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- A. Test Configuration -->
+                <div class="space-y-4 hover-card p-5 rounded-xl border border-borderMain/50 bg-gray-50/50 flex flex-col justify-between">
+                    <div class="space-y-4 w-full">
+                        <h3 class="font-bold flex items-center gap-2 text-primary"><i class="ph ph-flask"></i> A. Test Configuration</h3>
+                        
+                        <!-- Level 1: Department -->
+                        <div>
+                            <label class="block text-xs font-semibold text-textSec mb-1">Laboratory Department</label>
+                            <select required class="input-field" id="dept">
+                                <option value="" disabled selected>Select Department...</option>
+                                <option value="Hematologi">Hematologi</option>
+                                <option value="Kimia Klinik">Kimia Klinik</option>
+                                <option value="Urinalisis">Urinalisis</option>
+                                <option value="Imunologi & Serologi">Imunologi & Serologi</option>
+                                <option value="Mikrobiologi">Mikrobiologi</option>
+                                <option value="Patologi Anatomi">Patologi Anatomi</option>
+                                <option value="Patologi Klinik">Patologi Klinik</option>
+                                <option value="Toksikologi">Toksikologi</option>
+                                <option value="Bank Darah">Bank Darah</option>
+                                <option value="Koagulasi">Koagulasi</option>
+                                <option value="Molekuler (PCR)">Molekuler (PCR)</option>
+                                <option value="Parasitologi">Parasitologi</option>
+                                <option value="Analisis Feses">Analisis Feses</option>
+                            </select>
+                        </div>
+
+                        <!-- Level 2: Category -->
+                        <div id="categoryContainer" class="hidden">
+                            <label class="block text-xs font-semibold text-textSec mb-1" id="categoryLabel">Test Category</label>
+                            <select required class="input-field" id="category">
+                                <option value="" disabled selected>Select Category...</option>
+                            </select>
+                        </div>
+
+                        <!-- Level 3: Specific Examination Options -->
+                        <div id="level3Container" class="hidden">
+                            <label class="block text-xs font-semibold text-textSec mb-1" id="level3Label">Option / Type</label>
+                            <select class="input-field" id="level3Select">
+                                <option value="" disabled selected>Select option...</option>
+                            </select>
+                        </div>
+
+                        <!-- Dynamic Checkbox Parameters Grid -->
+                        <div id="customParamsContainer" class="hidden bg-white p-3.5 rounded-xl border border-borderMain/60 max-h-[180px] overflow-y-auto">
+                            <label class="block text-xs font-bold text-primary mb-2">Custom Parameters Checklist</label>
+                            <div class="grid grid-cols-2 gap-2 text-xs" id="customParamsGrid">
+                                <!-- Populated dynamically by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Specimen Type (Dynamically synced) -->
+                        <div>
+                            <label class="block text-xs font-semibold text-textSec mb-1">Specimen Type</label>
+                            <select required class="input-field" id="specimen">
+                                <option value="" disabled selected>Pilih Departemen Terlebih Dahulu...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 items-start bg-pink-50 p-3 rounded-lg mt-4">
+                        <i class="ph ph-info text-primary mt-0.5"></i>
+                        <p class="text-xs text-textSec" id="configHint">Pilih departemen untuk merancang konfigurasi pengujian.</p>
+                    </div>
+                </div>
+
+                <!-- B & C. Patient & Doctor Info -->
+                <div class="flex flex-col gap-6">
+                    <div class="space-y-4 hover-card p-5 rounded-xl border border-borderMain/50 bg-gray-50/50 flex-1">
+                        <h3 class="font-bold flex items-center gap-2 text-primary"><i class="ph ph-user"></i> B. Patient Information</h3>
+                        <div>
+                            <label class="block text-xs font-semibold text-textSec mb-1">Patient Name</label>
+                            <input type="text" required class="input-field" id="patientName" placeholder="Masukkan nama pasien...">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-textSec mb-1">Date of Birth</label>
+                                <input type="date" required class="input-field" id="dob">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-textSec mb-1">Citizen ID</label>
+                                <input type="text" required class="input-field" id="citizenId" placeholder="Masukkan ID...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 hover-card p-5 rounded-xl border border-borderMain/50 bg-gray-50/50">
+                        <h3 class="font-bold flex items-center gap-2 text-primary"><i class="ph ph-stethoscope"></i> C. Ordering Doctor</h3>
+                        <div>
+                            <label class="block text-xs font-semibold text-textSec mb-1">Doctor Name</label>
+                            <input type="text" required class="input-field" id="doctorName" placeholder="Masukkan nama dokter pengirim...">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- D. Clinical Info -->
+                <div class="space-y-4 hover-card p-5 rounded-xl border border-borderMain/50 bg-gray-50/50 flex flex-col">
+                    <h3 class="font-bold flex items-center gap-2 text-primary"><i class="ph ph-clipboard-text"></i> D. Clinical Information</h3>
+                    <div class="flex-1 flex flex-col">
+                        <label class="block text-xs font-semibold text-textSec mb-1">Anamnesis / Temuan Klinis / Diagnosis</label>
+                        <textarea required class="input-field flex-1 min-h-[200px] resize-none" id="clinicalInfo" placeholder="Ketik deskripsi klinis pasien di sini... (Contoh: Demam tinggi 5 hari, curiga infeksi dengue)"></textarea>
+                    </div>
+                    <p class="text-xs text-textSec mt-2">Informasi klinis ini akan digunakan AI untuk menghasilkan hasil laboratorium yang paling sesuai dengan kondisi pasien.</p>
+                </div>
+            </form>
+
+            <!-- Action Bar -->
+            <div class="mt-8 bg-pink-50/50 p-4 rounded-xl border border-pink-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <p class="text-sm font-medium text-textMain">Pastikan semua data telah diisi dengan lengkap dan benar.</p>
+                    <div class="flex flex-wrap gap-4 mt-2 text-xs text-textSec">
+                        <span class="flex items-center gap-1" id="valConfig"><i class="ph ph-check-circle text-gray-400"></i> Test Configuration</span>
+                        <span class="flex items-center gap-1" id="valPatient"><i class="ph ph-check-circle text-gray-400"></i> Patient Info</span>
+                        <span class="flex items-center gap-1" id="valDoctor"><i class="ph ph-check-circle text-gray-400"></i> Doctor Name</span>
+                        <span class="flex items-center gap-1" id="valClinical"><i class="ph ph-check-circle text-gray-400"></i> Clinical Info</span>
+                    </div>
+                </div>
+                <button id="analyzeBtn" disabled class="px-8 py-3 rounded-xl font-bold transition-all duration-250 ease-in-out flex items-center gap-2">
+                    <i class="ph ph-magic-wand text-lg"></i>
+                    <span id="btnText">Mulai Analysis</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION 2: RESULTS (Hidden by default) -->
+        <section id="resultSection" class="hidden bg-cardBg rounded-xl shadow-soft p-6 border border-borderMain/50">
+            <div class="flex items-center justify-between border-b border-borderMain pb-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <i class="ph ph-files text-2xl text-primary"></i>
+                    <h2 class="text-xl font-bold text-primaryHover">2. HASIL ANALISIS LABORATORIUM</h2>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                
+                <!-- A. Laboratory Result Table -->
+                <div class="xl:col-span-1 space-y-4 hover-card p-5 rounded-xl border border-borderMain/50 bg-gray-50/50 flex flex-col max-h-[700px]">
+                    <h3 class="font-bold flex items-center gap-2 text-primary"><i class="ph ph-drop"></i> A. Laboratory Result</h3>
+                    <div class="overflow-y-auto flex-1 pr-2">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-textSec uppercase bg-gray-100/50 sticky top-0">
+                                <tr>
+                                    <th class="px-2 py-3 font-semibold rounded-tl-lg">Parameter</th>
+                                    <th class="px-2 py-3 font-semibold">Result</th>
+                                    <th class="px-2 py-3 font-semibold">Unit</th>
+                                    <th class="px-2 py-3 font-semibold">Ref. Range</th>
+                                    <th class="px-2 py-3 font-semibold rounded-tr-lg">Flag</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultTableBody" class="divide-y divide-borderMain">
+                                <!-- Rows generated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="flex justify-between text-xs font-medium pt-2 border-t border-borderMain">
+                        <span class="text-danger flex items-center gap-1"><i class="ph-bold ph-arrow-up"></i> High (Tinggi)</span>
+                        <span class="text-danger flex items-center gap-1"><i class="ph-bold ph-arrow-down"></i> Low (Rendah)</span>
+                        <span class="text-success flex items-center gap-1"><i class="ph-bold ph-check"></i> Normal</span>
+                    </div>
+                </div>
+
+                <!-- B. Clinical Analysis -->
+                <div class="xl:col-span-1 flex flex-col gap-4">
+                    <div class="space-y-3 hover-card p-5 rounded-xl border border-borderMain/50 bg-gray-50/50">
+                        <h3 class="font-bold flex items-center gap-2 text-primary"><i class="ph ph-activity"></i> B. Clinical Analysis & Interpretation</h3>
+                        
+                        <div>
+                            <h4 class="text-sm font-semibold text-primaryHover flex items-center gap-1 mb-1"><i class="ph ph-check-circle"></i> Interpretasi</h4>
+                            <p id="resInterpretation" class="text-sm text-textMain bg-white p-3 rounded-lg border border-borderMain/30"></p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-semibold text-primaryHover flex items-center gap-1 mb-1"><i class="ph ph-heartbeat"></i> Korelasi Klinis</h4>
+                            <p id="resCorrelation" class="text-sm text-textMain bg-white p-3 rounded-lg border border-borderMain/30"></p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-semibold text-primaryHover flex items-center gap-1 mb-1"><i class="ph ph-stethoscope"></i> Kemungkinan Diagnosis</h4>
+                            <p id="resDiagnosis" class="text-sm font-bold text-textMain bg-white p-3 rounded-lg border border-borderMain/30"></p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-semibold text-primaryHover flex items-center gap-1 mb-1"><i class="ph ph-prescription"></i> Rekomendasi</h4>
+                            <ul id="resRecommendations" class="list-disc pl-5 text-sm text-textMain space-y-1 bg-white p-3 rounded-lg border border-borderMain/30">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- C. Report Preview -->
+                <div class="xl:col-span-1 space-y-4 hover-card p-5 rounded-xl border border-borderMain/50 bg-gray-50/50 flex flex-col">
+                     <div class="flex justify-between items-center">
+                        <h3 class="font-bold flex items-center gap-2 text-primary"><i class="ph ph-file-pdf"></i> C. Laboratory Report Preview</h3>
+                        <button type="button" id="btn-download-pdf" class="border border-primary text-primary hover:bg-pink-50 px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs font-bold transition-colors">
+                            <i class="ph-bold ph-printer"></i> Print / Save PDF
+                        </button>
+                     </div>
+                     
+                     <!-- Paper Mockup -->
+                     <div class="flex-grow bg-white border border-gray-200 shadow-md p-6 rounded-sm relative overflow-hidden text-[10px]" id="report-preview-content">
+                         <!-- Background Logo Watermark -->
+                         <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none text-primary">
+                              <i class="ph-fill ph-flask text-[150px]"></i>
+                         </div>
+                         
+                         <div class="relative z-10">
+                             <div class="text-center text-primaryHover font-bold text-sm mb-4 border-b border-pink-200 pb-2 flex flex-col items-center relative">
+                                 <span>ROXWOOD HOSPITAL</span>
+                                 <span class="text-primary">LABORATORY REPORT</span>
+                                 <div class="absolute top-0 right-0 text-pink-100 text-3xl"><i class="ph-fill ph-plus-circle"></i></div>
+                             </div>
+                             
+                             <div class="grid grid-cols-2 gap-x-4 gap-y-1 mb-4 text-textMain font-medium">
+                                 <div><span class="text-textSec w-20 inline-block">Patient Name</span>: <span id="prev-name"></span></div>
+                                 <div><span class="text-textSec w-24 inline-block">Ordering Doctor</span>: <span id="prev-doctor"></span></div>
+                                 <div><span class="text-textSec w-20 inline-block">Date of Birth</span>: <span id="prev-dob"></span></div>
+                                 <div><span class="text-textSec w-24 inline-block">Department</span>: <span id="prev-dept"></span></div>
+                                 <div><span class="text-textSec w-20 inline-block">Citizen ID</span>: <span id="prev-id"></span></div>
+                                 <div><span class="text-textSec w-24 inline-block">Requested Exam</span>: <span id="prev-exam"></span></div>
+                                 <div><span class="text-textSec w-20 inline-block">Specimen</span>: <span id="prev-specimen"></span></div>
+                                 <div><span class="text-textSec w-24 inline-block">Report Date</span>: <span class="current-datetime-text"></span></div>
+                             </div>
+                             
+                             <div class="text-primary font-bold border-b border-gray-100 pb-1 mb-2 uppercase text-[10px]">HASIL PEMERIKSAAN</div>
+                             <table class="w-full text-left border-collapse mb-4" id="prev-table">
+                                 <thead>
+                                     <tr class="text-textSec border-b border-gray-100 text-[9px]">
+                                         <th class="font-semibold py-1">Parameter</th>
+                                         <th class="font-semibold py-1">Result</th>
+                                         <th class="font-semibold py-1">Unit</th>
+                                         <th class="font-semibold py-1">Reference Range</th>
+                                         <th class="font-semibold py-1">Flag</th>
+                                     </tr>
+                                 </thead>
+                                 <tbody id="prev-table-body">
+                                     <!-- Populated by JS -->
+                                 </tbody>
+                             </table>
+                             
+                             <div class="space-y-2">
+                                 <div>
+                                     <div class="text-primary font-bold uppercase text-[9px]">INTERPRETASI</div>
+                                     <div id="prev-interpretation" class="text-textMain leading-tight text-[9px]"></div>
+                                 </div>
+                                 <div>
+                                     <div class="text-primary font-bold uppercase text-[9px]">KORELASI KLINIS</div>
+                                     <div id="prev-clinical-correlation" class="text-textMain leading-tight text-[9px]"></div>
+                                 </div>
+                                 <div>
+                                     <div class="text-primary font-bold uppercase text-[9px]">KESAN</div>
+                                     <div id="prev-diagnosis" class="text-textMain leading-tight font-bold text-[9px]"></div>
+                                 </div>
+                                 <div>
+                                     <div class="text-primary font-bold uppercase text-[9px]">REKOMENDASI</div>
+                                     <ul id="prev-recommendation" class="list-disc list-inside text-textMain leading-tight text-[9px]"></ul>
+                                 </div>
+                             </div>
+                             
+                             <div class="mt-4 pt-2 border-t border-gray-100 text-center text-textSec text-[8px] flex justify-between items-end">
+                                 <div class="text-left flex flex-col justify-between h-full">
+                                     <p class="mb-4">Pemeriksaan ini telah divalidasi secara elektronik.</p>
+                                     <div class="mt-2">
+                                         <p class="text-textSec mb-1">Ordering Doctor / DPJP:</p>
+                                         <div id="prev-signature" class="text-[24px] text-primaryHover leading-none mb-1 -ml-1 font-signature"></div>
+                                         <p class="font-bold text-textMain border-t border-gray-200 inline-block pt-1 min-w-[120px]" id="prev-doctor-sign-name"></p>
+                                     </div>
+                                 </div>
+                                 <div class="text-right flex flex-col items-end">
+                                     <p class="font-bold text-textMain mb-2">ROXWOOD HOSPITAL LABORATORY</p>
+                                     <div class="w-12 h-12 rounded-full border-2 border-pink-200 text-pink-300 flex items-center justify-center flex-col text-[5px] font-bold">
+                                         <span>ROXWOOD</span>
+                                         <i class="ph-bold ph-plus text-[14px] my-0.5"></i>
+                                         <span>VALIDATED</span>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                </div>
+
+            </div>
+            
+            <div class="mt-6 flex gap-2 items-center bg-red-50 p-3 rounded-lg border border-red-100 text-danger text-xs font-medium">
+                <i class="ph-fill ph-warning-circle text-lg"></i>
+                <p>Catatan: Hasil laboratorium ini adalah simulasi berbasis AI untuk keperluan roleplay dan edukasi. Tidak digunakan untuk diagnosis medis sebenarnya.</p>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // API Key setup (System will provide)
+        const apiKey = "";
+        
+        // Setup Date
+        const updateTime = () => {
+            const now = new Date();
+            const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit', timeZoneName: 'short' };
+            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('id-ID', options).replace(/\./g, ':');
+        };
+        updateTime();
+        setInterval(updateTime, 60000);
+
+        // DATA DICTIONARY FOR HIERARCHICAL CONFIGURATION
+        const dbHierarchy = {
+            "Hematologi": {
+                hint: "Sediaan untuk pemeriksaan darah rutin lengkap & morfologi sel darah.",
+                specimens: ["Whole Blood EDTA", "Darah Kapiler (Microtainer)"],
+                categories: {
+                    "Complete Blood Count (CBC)": {
+                        type: "select",
+                        options: ["Semua Parameter (Default)", "Custom Parameter"],
+                        custom: ["Hemoglobin", "Hematokrit", "RBC", "WBC", "Platelet", "MCV", "MCH", "MCHC", "RDW"]
+                    },
+                    "Hitung Jenis Leukosit": { type: "none" },
+                    "Laju Endap Darah (LED)": { type: "none" },
+                    "Retikulosit": { type: "none" },
+                    "Apusan Darah Tepi": { type: "none" },
+                    "Golongan Darah & Rh": { type: "none" }
+                }
+            },
+            "Kimia Klinik": {
+                hint: "Pemeriksaan fungsi organ metabolik dan kimiawi tubuh.",
+                specimens: ["Serum", "Plasma Heparin", "Urine 24 Jam", "Cairan Tubuh (Pleura/Ascites)"],
+                categories: {
+                    "Glukosa": { type: "none" },
+                    "Fungsi Ginjal": {
+                        type: "select",
+                        options: ["Ureum", "Kreatinin", "eGFR", "BUN"]
+                    },
+                    "Fungsi Hati": { type: "none" },
+                    "Profil Lipid": { type: "none" },
+                    "Elektrolit": { type: "none" },
+                    "Asam Urat": { type: "none" },
+                    "Enzim Jantung": { type: "none" },
+                    "Pankreas": { type: "none" }
+                }
+            },
+            "Urinalisis": {
+                hint: "Pemeriksaan kondisi ginjal, ISK, dan saringan metabolisme urin.",
+                specimens: ["Urine Porsi Tengah (Midstream)", "Urine Pagi", "Urine 24 Jam", "Urine Kateter"],
+                categories: {
+                    "Urinalisis Lengkap": {
+                        type: "select",
+                        options: ["Lengkap (Default)", "Makroskopis", "Kimia", "Sedimen"],
+                        custom: ["Protein", "Glukosa", "Nitrit", "Leukosit", "Keton", "Bilirubin", "Darah", "pH", "Berat Jenis"]
+                    },
+                    "Tes Kehamilan": {
+                        type: "select",
+                        options: ["Urine hCG", "Serum β-hCG"]
+                    },
+                    "Drug Screening Urine": {
+                        type: "select",
+                        options: ["5 Panel", "10 Panel", "15 Panel", "Custom"],
+                        custom: ["THC", "Amphetamine", "Methamphetamine", "Cocaine", "Morphine", "Heroin", "Fentanyl", "MDMA", "Ketamine", "Benzodiazepine", "Methadone", "Barbiturat", "Tramadol"]
+                    },
+                    "Protein Urine": { type: "none" },
+                    "Mikroalbumin": { type: "none" },
+                    "Sedimen Urine": { type: "none" }
+                }
+            },
+            "Imunologi & Serologi": {
+                hint: "Analisis antibodi, antigen infeksius, dan biomarker imunologis.",
+                specimens: ["Serum", "Plasma EDTA", "Plasma Heparin"],
+                categories: {
+                    "Demam": {
+                        type: "select",
+                        options: ["Dengue NS1", "IgM Dengue", "IgG Dengue", "Typhidot", "Widal", "Malaria", "Leptospira"]
+                    },
+                    "Hepatitis": { type: "none" },
+                    "HIV": { type: "none" },
+                    "Autoimun": { type: "none" },
+                    "TORCH": { type: "none" },
+                    "COVID-19": { type: "none" }
+                }
+            },
+            "Mikrobiologi": {
+                hint: "Pembiakan kuman patogen dan uji sensitivitas antibiotika.",
+                specimens: ["Darah (Kultur T aerobic/anaerobic)", "Urine Porsi Tengah", "Feses Segar", "Swab Tenggorokan/Hidung", "Sputum", "Pus / Eksudat Luka", "Cairan Tubuh"],
+                categories: {
+                    "Kultur Darah": { type: "none" },
+                    "Kultur Urine": {
+                        type: "select",
+                        options: ["Kultur", "Gram Stain", "Antibiotic Sensitivity"]
+                    },
+                    "Kultur Luka": { type: "none" },
+                    "Kultur Sputum": { type: "none" },
+                    "Kultur Feses": { type: "none" },
+                    "Swab Tenggorokan": { type: "none" }
+                }
+            },
+            "Patologi Anatomi": {
+                hint: "Pemeriksaan sitologi dan histopatologi sampel jaringan seluler.",
+                specimens: ["Jaringan Biopsi (dalam Formalin)", "Cairan Aspirasi / FNAB", "Smear / Hapusan (Pap Smear)"],
+                categories: {
+                    "Histopatologi": {
+                        type: "select",
+                        options: ["Kulit", "Payudara", "Serviks", "Kolon", "Lambung", "Paru", "Hati", "Ginjal", "Otak"]
+                    },
+                    "Sitologi": { type: "none" },
+                    "FNAB": { type: "none" },
+                    "Pap Smear": { type: "none" }
+                }
+            },
+            "Patologi Klinik": {
+                hint: "Analisis biomarker spesifik tumor, hormon metabolik rutin, dan sejenisnya.",
+                specimens: ["Serum", "Plasma", "Urine", "Cairan Pleura", "Cairan Serebrospinal (CSF)"],
+                categories: {
+                    "Biomarker Tumor": { type: "none" },
+                    "Pemeriksaan Hormon": {
+                        type: "select",
+                        options: ["TSH", "FT4", "FSH", "LH", "Estradiol", "Progesteron", "Testosteron", "Prolaktin"]
+                    },
+                    "Analisis Cairan Tubuh": { type: "none" },
+                    "Elektroforesis": { type: "none" },
+                    "Imunofiksasi": { type: "none" }
+                }
+            },
+            "Toksikologi": {
+                hint: "Pengujian tingkat racun, penyalahgunaan obat, logam berat, dan paparan zat kimia berbahaya.",
+                categories: {
+                    "Poison Screening": {
+                        type: "none",
+                        specimens: ["Isi Lambung / Bilasan (Gastric Lavage)", "Whole Blood EDTA (Darah Lengkap)", "Urine Porsi Tengah"]
+                    },
+                    "Drug Screening": {
+                        type: "select",
+                        options: ["5 Panel", "10 Panel", "Custom"],
+                        custom: ["THC", "Amphetamine", "Methamphetamine", "Cocaine", "Morphine", "Heroin", "Fentanyl", "MDMA", "Ketamine", "Benzodiazepine", "Methadone", "Barbiturat", "Tramadol"],
+                        specimens: ["Urine Porsi Tengah", "Whole Blood EDTA", "Rambut (Hair Sample)"]
+                    },
+                    "Chemical Analysis": {
+                        type: "none",
+                        specimens: ["Serum", "Plasma Heparin", "Urine 24 Jam"]
+                    },
+                    "Heavy Metal": {
+                        type: "none",
+                        specimens: ["Whole Blood Heparin (Bebas Logam)", "Rambut (Hair Sample)", "Urine 24 Jam"]
+                    },
+                    "Food Toxicology": {
+                        type: "none",
+                        specimens: ["Sampel Muntahan (Vomitus)", "Sisa Sampel Makanan / Minuman", "Whole Blood EDTA"]
+                    }
+                }
+            },
+            "Bank Darah": {
+                hint: "Layanan tipe darah dan kecocokan sediaan transfusi plasma.",
+                specimens: ["Whole Blood EDTA", "Serum (Non-aktif)"],
+                categories: {
+                    "Golongan Darah": { type: "none" },
+                    "Crossmatch": { type: "none" },
+                    "Antibody Screening": { type: "none" }
+                }
+            },
+            "Koagulasi": {
+                hint: "Pengukuran waktu respons bekuan sirkulasi plasma darah.",
+                specimens: ["Plasma Sitrat (Tabung Biru)"],
+                categories: {
+                    "PT": { type: "none" },
+                    "aPTT": { type: "none" },
+                    "INR": { type: "none" },
+                    "D-Dimer": { type: "none" },
+                    "Fibrinogen": { type: "none" }
+                }
+            },
+            "Molekuler (PCR)": {
+                hint: "Analisis sekuensing replikasi rantai DNA/RNA patogen dengan presisi.",
+                specimens: ["Swab Nasofaring / Orofaring (VTM)", "Serum", "Plasma", "Sputum", "Cairan Serebrospinal (CSF)"],
+                categories: {
+                    "COVID PCR": { type: "none" },
+                    "HIV Viral Load": { type: "none" },
+                    "HBV DNA": { type: "none" },
+                    "HCV RNA": { type: "none" },
+                    "HPV DNA": { type: "none" },
+                    "TB PCR": { type: "none" }
+                }
+            },
+            "Parasitologi": {
+                hint: "Identifikasi langsung mikroskopis dan serologi parasit patogen.",
+                specimens: ["Feses Segar", "Whole Blood EDTA", "Urine"],
+                categories: {
+                    "Malaria": { type: "none" },
+                    "Cacing": { type: "none" },
+                    "Protozoa": { type: "none" },
+                    "Parasit Darah": { type: "none" }
+                }
+            },
+            "Analisis Feses": {
+                hint: "Pemeriksaan makroskopis, mikroskopis, sisa pencernaan feses lengkap.",
+                specimens: ["Feses Segar", "Swab Rektal"],
+                categories: {
+                    "Feses Lengkap": { type: "none" },
+                    "FOBT": { type: "none" },
+                    "Parasit": { type: "none" },
+                    "Kultur Feses": { type: "none" }
+                }
+            }
+        };
+
+        // Form elements reference
+        const form = document.getElementById('labForm');
+        const inputs = form.querySelectorAll('input, select, textarea');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+
+        const deptSelect = document.getElementById('dept');
+        const categoryContainer = document.getElementById('categoryContainer');
+        const categorySelect = document.getElementById('category');
+        const level3Container = document.getElementById('level3Container');
+        const level3Select = document.getElementById('level3Select');
+        const customParamsContainer = document.getElementById('customParamsContainer');
+        const customParamsGrid = document.getElementById('customParamsGrid');
+        const specimenSelect = document.getElementById('specimen');
+        const configHint = document.getElementById('configHint');
+
+        // Custom Notification Toast instead of browser alerts
+        function showToast(message, type = 'error') {
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-4 right-4 z-50 px-6 py-3 rounded-xl shadow-lg border text-sm font-semibold transition-all duration-300 transform translate-y-10 opacity-0 flex items-center gap-2`;
+            
+            if (type === 'error') {
+                toast.classList.add('bg-red-50', 'text-red-600', 'border-red-100');
+                toast.innerHTML = `<i class="ph-bold ph-warning-circle text-lg"></i> ${message}`;
+            } else {
+                toast.classList.add('bg-green-50', 'text-green-600', 'border-green-100');
+                toast.innerHTML = `<i class="ph-bold ph-check-circle text-lg"></i> ${message}`;
+            }
+            
+            document.body.appendChild(toast);
+            
+            // Slide & Fade In
+            setTimeout(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+            }, 10);
+            
+            // Slide & Fade Out & Destroy
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => {
+                    if (document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                    }
+                }, 300);
+            }, 4000);
+        }
+
+        // Logika loading sediaan spesimen
+        function populateSpecimens(selectedDept, selectedCat) {
+            specimenSelect.innerHTML = '<option value="" disabled selected>Select Specimen...</option>';
+            
+            if (!selectedDept || !dbHierarchy[selectedDept]) return;
+            const deptData = dbHierarchy[selectedDept];
+
+            let targetSpecimens = [];
+            
+            // Check if selected category has specific specimens (e.g. Toksikologi)
+            if (selectedCat && deptData.categories[selectedCat] && deptData.categories[selectedCat].specimens) {
+                targetSpecimens = deptData.categories[selectedCat].specimens;
+            } else if (deptData.specimens) {
+                // Otherwise use department-level specimens
+                targetSpecimens = deptData.specimens;
+            }
+
+            if (targetSpecimens.length > 0) {
+                targetSpecimens.forEach(spec => {
+                    const opt = document.createElement('option');
+                    opt.value = spec;
+                    opt.textContent = spec;
+                    specimenSelect.appendChild(opt);
+                });
+            } else {
+                specimenSelect.innerHTML = '<option value="" disabled selected>Pilih Kategori Terlebih Dahulu...</option>';
+            }
+        }
+
+        // CASCADING DROPDOWN LOGIC
+        deptSelect.addEventListener('change', () => {
+            const selectedDept = deptSelect.value;
+            
+            // Clear Level 2, 3, and Specimen
+            categorySelect.innerHTML = '<option value="" disabled selected>Select Category...</option>';
+            level3Select.innerHTML = '<option value="" disabled selected>Select option...</option>';
+            level3Container.classList.add('hidden');
+            customParamsContainer.classList.add('hidden');
+
+            if (selectedDept && dbHierarchy[selectedDept]) {
+                const deptData = dbHierarchy[selectedDept];
+                configHint.textContent = deptData.hint;
+
+                // Populate categories
+                Object.keys(deptData.categories).forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat;
+                    opt.textContent = cat;
+                    categorySelect.appendChild(opt);
+                });
+
+                categoryContainer.classList.remove('hidden');
+                
+                // Populate specimen (if department has general specimens, e.g. Hematologi)
+                populateSpecimens(selectedDept, null);
+            } else {
+                categoryContainer.classList.add('hidden');
+                configHint.textContent = "Pilih departemen untuk merancang konfigurasi pengujian.";
+                specimenSelect.innerHTML = '<option value="" disabled selected>Pilih Departemen Terlebih Dahulu...</option>';
+            }
+            validateForm();
+        });
+
+        categorySelect.addEventListener('change', () => {
+            const selectedDept = deptSelect.value;
+            const selectedCat = categorySelect.value;
+
+            // Clear Level 3 selection & Custom Param
+            level3Select.innerHTML = '<option value="" disabled selected>Select option...</option>';
+            level3Container.classList.add('hidden');
+            customParamsContainer.classList.add('hidden');
+
+            if (selectedDept && selectedCat && dbHierarchy[selectedDept].categories[selectedCat]) {
+                const catData = dbHierarchy[selectedDept].categories[selectedCat];
+
+                if (catData.type === 'select') {
+                    // Populate Level 3 select
+                    catData.options.forEach(optVal => {
+                        const opt = document.createElement('option');
+                        opt.value = optVal;
+                        opt.textContent = optVal;
+                        level3Select.appendChild(opt);
+                    });
+                    level3Container.classList.remove('hidden');
+                }
+
+                // Dynamic update specimens (highly critical for Toksikologi)
+                populateSpecimens(selectedDept, selectedCat);
+            }
+            validateForm();
+        });
+
+        // Event listener for Level 3 options to trigger Custom Checklist
+        level3Select.addEventListener('change', () => {
+            const selectedDept = deptSelect.value;
+            const selectedCat = categorySelect.value;
+            const selectedLvl3 = level3Select.value;
+
+            customParamsContainer.classList.add('hidden');
+            customParamsGrid.innerHTML = '';
+
+            if (selectedDept && selectedCat && dbHierarchy[selectedDept].categories[selectedCat]) {
+                const catData = dbHierarchy[selectedDept].categories[selectedCat];
+
+                // Check triggers for checklists
+                let shouldShowCustom = false;
+                if (selectedCat === 'Complete Blood Count (CBC)' && selectedLvl3 === 'Custom Parameter') {
+                    shouldShowCustom = true;
+                } else if (selectedCat === 'Urinalisis Lengkap' && selectedLvl3 === 'Kimia') {
+                    shouldShowCustom = true;
+                } else if (selectedCat === 'Drug Screening Urine' && selectedLvl3 === 'Custom') {
+                    shouldShowCustom = true;
+                } else if (selectedCat === 'Drug Screening' && selectedLvl3 === 'Custom') {
+                    shouldShowCustom = true;
+                }
+
+                if (shouldShowCustom && catData.custom) {
+                    catData.custom.forEach(item => {
+                        const itemWrapper = document.createElement('label');
+                        itemWrapper.className = 'flex items-center gap-2 cursor-pointer p-1 hover:bg-pink-50 rounded';
+                        itemWrapper.innerHTML = `
+                            <input type="checkbox" value="${item}" class="custom-checkbox" checked>
+                            <span class="text-textMain font-medium">${item}</span>
+                        `;
+                        // Attach change event for instant validation
+                        itemWrapper.querySelector('input').addEventListener('change', validateForm);
+                        customParamsGrid.appendChild(itemWrapper);
+                    });
+                    customParamsContainer.classList.remove('hidden');
+                }
+            }
+            validateForm();
+        });
+
+        // Form Validation Logic
+        function validateForm() {
+            let isValid = true;
+            let sectionValid = { config: true, patient: true, doctor: true, clinical: true };
+
+            // Check config validations (Level 1, 2, and specimen are always required)
+            if(!document.getElementById('dept').value) sectionValid.config = false;
+            if(!document.getElementById('category').value) sectionValid.config = false;
+            if(!document.getElementById('specimen').value) sectionValid.config = false;
+
+            // If Level 3 is active and visible, it must have a selection
+            if (!level3Container.classList.contains('hidden') && !level3Select.value) {
+                sectionValid.config = false;
+            }
+
+            // If Custom checkboxes are active and visible, at least 1 must be checked
+            if (!customParamsContainer.classList.contains('hidden')) {
+                const checkedCount = customParamsGrid.querySelectorAll('input[type="checkbox"]:checked').length;
+                if (checkedCount === 0) sectionValid.config = false;
+            }
+
+            // Check patient Info
+            ['patientName', 'dob', 'citizenId'].forEach(id => {
+                if(!document.getElementById(id).value.trim()) sectionValid.patient = false;
+            });
+            // Check doctor
+            if(!document.getElementById('doctorName').value.trim()) sectionValid.doctor = false;
+            // Check clinical
+            if(!document.getElementById('clinicalInfo').value.trim()) sectionValid.clinical = false;
+
+            // Update UI indicators
+            const updateIcon = (el, valid) => {
+                const icon = el.querySelector('i');
+                if(valid) {
+                    icon.className = 'ph-fill ph-check-circle text-success';
+                    el.classList.add('text-success');
+                    el.classList.remove('text-gray-400');
+                } else {
+                    icon.className = 'ph ph-check-circle text-gray-400';
+                    el.classList.remove('text-success');
+                    el.classList.add('text-gray-400');
+                }
+            };
+
+            updateIcon(document.getElementById('valConfig'), sectionValid.config);
+            updateIcon(document.getElementById('valPatient'), sectionValid.patient);
+            updateIcon(document.getElementById('valDoctor'), sectionValid.doctor);
+            updateIcon(document.getElementById('valClinical'), sectionValid.clinical);
+
+            isValid = sectionValid.config && sectionValid.patient && sectionValid.doctor && sectionValid.clinical;
+            analyzeBtn.disabled = !isValid;
+        }
+
+        // Attach global input listeners
+        inputs.forEach(input => {
+            input.addEventListener('input', validateForm);
+            input.addEventListener('change', validateForm);
+        });
+
+        // Exponential Backoff for API Call
+        async function fetchWithRetry(url, options, maxRetries = 5) {
+            let delays = [1000, 2000, 4000, 8000, 16000];
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return await response.json();
+                } catch (e) {
+                    if (i === maxRetries - 1) throw e;
+                    await new Promise(r => setTimeout(r, delays[i]));
+                }
+            }
+        }
+
+        // Handle Analysis
+        analyzeBtn.addEventListener('click', async () => {
+            const btnText = document.getElementById('btnText');
+            const resultSection = document.getElementById('resultSection');
+            
+            // Set Loading State
+            analyzeBtn.disabled = true;
+            btnText.textContent = "Processing AI Analysis...";
+            analyzeBtn.innerHTML = `<i class="ph ph-spinner-gap animate-spin text-lg"></i> <span id="btnText">Processing AI Analysis...</span>`;
+            resultSection.classList.add('hidden');
+
+            const deptValue = document.getElementById('dept').value;
+            const categoryValue = document.getElementById('category').value;
+            const specimenValue = document.getElementById('specimen').value;
+            const clinicalInfo = document.getElementById('clinicalInfo').value;
+
+            // Collect Level 3 options & custom parameters
+            let optionDetail = "";
+            if (!level3Container.classList.contains('hidden')) {
+                optionDetail = ` (Pilihan spesifik: ${level3Select.value})`;
+            }
+
+            let customParamsDetail = "";
+            if (!customParamsContainer.classList.contains('hidden')) {
+                const checked = Array.from(customParamsGrid.querySelectorAll('input[type="checkbox"]:checked')).map(el => el.value);
+                if (checked.length > 0) {
+                    customParamsDetail = `, Parameter khusus yang diminta: [${checked.join(', ')}]`;
+                }
+            }
+
+            const prompt = `Anda adalah Sistem Pakar AI LIS (Laboratory Information System) dan bertindak sebagai Dokter Spesialis Patologi Klinik (Sp.PK) di Roxwood Hospital. 
+            
+            Buat laporan hasil pemeriksaan laboratorium yang medis, profesional, dan realistis untuk:
+            - Departemen: ${deptValue}
+            - Kategori Pemeriksaan: ${categoryValue}${optionDetail}${customParamsDetail}
+            - Jenis Spesimen: ${specimenValue}
+            
+            Berdasarkan anamnesis / temuan klinis pasien: "${clinicalInfo}". 
+            
+            Instruksi Khusus:
+            1. Hasilkan nilai parameter, satuan ukur baku (SI units), dan rentang rujukan (reference range) yang akurat sesuai standar medis internasional.
+            2. Buat hasil temuan konsisten dengan diagnosis klinis pasien (berikan *Flag* 'High' atau 'Low' pada parameter relevan yang menunjang patologi penyakit tersebut).
+            3. Jika ada parameter khusus (Custom) yang diminta, WAJIB sertakan semuanya dalam tabel hasil.
+            4. Gunakan bahasa medis klinis yang sangat profesional, terstruktur, dan baku (Bahasa Indonesia) dalam interpretasi, korelasi, kesan, dan rekomendasi.
+            5. Kesan (Diagnosis) harus menggunakan format suspek klinis / kesimpulan patologi yang tajam berdasarkan hasil lab.`;
+
+            const systemInstruction = "Anda adalah Kepala Laboratorium bergelar Dokter Spesialis Patologi Klinik (Sp.PK). Keluaran harus menggunakan tata bahasa kedokteran formal, baku, dan sesuai dengan standar format pelaporan laboratorium rumah sakit tipe A.";
+
+            const schema = {
+                type: "OBJECT",
+                properties: {
+                    results: {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                parameter: { type: "STRING" },
+                                result: { type: "STRING" },
+                                unit: { type: "STRING" },
+                                reference_range: { type: "STRING" },
+                                flag: { type: "STRING", description: "Must be one of: 'Normal', 'High', or 'Low'" }
+                            }
+                        }
+                    },
+                    interpretation: { type: "STRING" },
+                    clinical_correlation: { type: "STRING" },
+                    diagnosis: { type: "STRING" },
+                    recommendations: { type: "ARRAY", items: { type: "STRING" } }
+                }
+            };
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: schema,
+                    temperature: 0.3
+                }
+            };
+
+            try {
+                const responseData = await fetchWithRetry(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const content = responseData.candidates[0].content.parts[0].text;
+                const data = JSON.parse(content);
+                renderResults(data);
+                
+                resultSection.classList.remove('hidden');
+                resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            } catch (error) {
+                showToast("Terjadi kesalahan saat memproses data. Silakan coba lagi. (Pastikan koneksi internet stabil & model diizinkan)", "error");
+                console.error(error);
+            } finally {
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = `<i class="ph ph-magic-wand text-lg"></i> <span id="btnText">Update Analysis</span>`;
+            }
+        });
+
+        function renderResults(data) {
+            // 1. Populate Table
+            const tbody = document.getElementById('resultTableBody');
+            const pdfTbody = document.getElementById('prev-table-body');
+            tbody.innerHTML = '';
+            if (pdfTbody) pdfTbody.innerHTML = '';
+
+            data.results.forEach(item => {
+                let flagClass = 'text-success';
+                let flagIcon = '<i class="ph-bold ph-check"></i> Normal';
+                let resultClass = 'text-textMain';
+
+                if(item.flag.toLowerCase() === 'high') {
+                    flagClass = 'text-danger font-semibold';
+                    flagIcon = '<i class="ph-bold ph-arrow-up"></i> High';
+                    resultClass = 'text-danger font-bold';
+                } else if(item.flag.toLowerCase() === 'low') {
+                    flagClass = 'text-danger font-semibold';
+                    flagIcon = '<i class="ph-bold ph-arrow-down"></i> Low';
+                    resultClass = 'text-danger font-bold';
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-pink-50/30 transition-colors';
+                tr.innerHTML = `
+                    <td class="px-2 py-3 border-b border-borderMain font-medium">${item.parameter}</td>
+                    <td class="px-2 py-3 border-b border-borderMain ${resultClass}">${item.result}</td>
+                    <td class="px-2 py-3 border-b border-borderMain">${item.unit}</td>
+                    <td class="px-2 py-3 border-b border-borderMain">${item.reference_range}</td>
+                    <td class="px-2 py-3 border-b border-borderMain ${flagClass} flex items-center gap-1">${flagIcon}</td>
+                `;
+                tbody.appendChild(tr);
+
+                // Add to PDF table
+                if(pdfTbody) {
+                    const pdfTr = document.createElement('tr');
+                    pdfTr.className = 'border-b border-dashed border-gray-100 text-[9px]';
+                    pdfTr.innerHTML = `
+                        <td class="py-1">${item.parameter}</td>
+                        <td class="py-1 ${resultClass}">${item.result}</td>
+                        <td class="py-1">${item.unit}</td>
+                        <td class="py-1">${item.reference_range}</td>
+                        <td class="py-1 ${flagClass} font-semibold">${item.flag}</td>
+                    `;
+                    pdfTbody.appendChild(pdfTr);
+                }
+            });
+
+            // 2. Populate Analysis Cards
+            document.getElementById('resInterpretation').textContent = data.interpretation;
+            document.getElementById('resCorrelation').textContent = data.clinical_correlation;
+            document.getElementById('resDiagnosis').textContent = data.diagnosis;
+            
+            const recList = document.getElementById('resRecommendations');
+            recList.innerHTML = '';
+            data.recommendations.forEach(rec => {
+                const li = document.createElement('li');
+                li.textContent = rec;
+                recList.appendChild(li);
+            });
+
+            // 3. Populate PDF Preview
+            document.getElementById('prev-name').textContent = document.getElementById('patientName').value || '-';
+            document.getElementById('prev-dob').textContent = document.getElementById('dob').value || '-';
+            document.getElementById('prev-id').textContent = document.getElementById('citizenId').value || '-';
+            document.getElementById('prev-doctor').textContent = document.getElementById('doctorName').value || '-';
+            document.getElementById('prev-dept').textContent = document.getElementById('dept').value || '-';
+            
+            // Signature logic
+            const doctorNameValue = document.getElementById('doctorName').value || 'Penanggung Jawab';
+            document.getElementById('prev-signature').textContent = doctorNameValue;
+            document.getElementById('prev-doctor-sign-name').textContent = doctorNameValue;
+
+            // Construct preview exam description
+            let examDesc = document.getElementById('category').value;
+            if (!level3Container.classList.contains('hidden') && level3Select.value) {
+                examDesc += ` (${level3Select.value})`;
+            }
+            document.getElementById('prev-exam').textContent = examDesc;
+            document.getElementById('prev-specimen').textContent = document.getElementById('specimen').value || '-';
+            
+            // Set Datetime for PDF
+            document.querySelectorAll('.current-datetime-text').forEach(el => {
+                el.textContent = document.getElementById('currentDateTime').textContent;
+            });
+            
+            document.getElementById('prev-interpretation').textContent = data.interpretation;
+            document.getElementById('prev-clinical-correlation').textContent = data.clinical_correlation;
+            document.getElementById('prev-diagnosis').textContent = data.diagnosis;
+            
+            const pdfRecList = document.getElementById('prev-recommendation');
+            if (pdfRecList) {
+                pdfRecList.innerHTML = '';
+                data.recommendations.forEach(rec => {
+                    const li = document.createElement('li');
+                    li.textContent = rec;
+                    pdfRecList.appendChild(li);
+                });
+            }
+        }
+
+        // --- PRINT TO PDF LOGIC (Membuka Jendela Baru & Cetak) ---
+        document.getElementById('btn-download-pdf').addEventListener('click', function() {
+            const element = document.getElementById('report-preview-content');
+            const content = element.innerHTML;
+            
+            // Setup Title / Nama File (Akan menjadi default nama saat disimpan ke PDF di browser)
+            const patientNameInput = document.getElementById('patientName').value;
+            const patientName = patientNameInput ? patientNameInput.replace(/[^a-z0-9]/gi, '_').toUpperCase() : 'PATIENT';
+            const dateStr = new Date().toISOString().slice(0,10);
+            const title = `ROXWOOD_LAB_${patientName}_${dateStr}`;
+
+            // Buka jendela baru
+            const printWindow = window.open('', '_blank');
+            
+            // Konfigurasi Tailwind minimum untuk jendela print agar warna tetap sama
+            const tailwindConfig = `
+                tailwind.config = {
+                    theme: {
+                        extend: {
+                            colors: {
+                                primary: '#F48FB1',
+                                primaryHover: '#EC407A',
+                                borderMain: '#E5E7EB',
+                                textMain: '#374151',
+                                textSec: '#6B7280',
+                                success: '#4CAF50',
+                                danger: '#EF4444',
+                            },
+                            fontFamily: {
+                                sans: ['Poppins', 'sans-serif'],
+                                signature: ['Caveat', 'cursive']
+                            }
+                        }
+                    }
+                }
+            `;
+
+            // Tulis struktur HTML lengkap ke jendela baru
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="id">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>${title}</title>
+                    
+                    <!-- Font & Icon -->
+                    <link rel="preconnect" href="https://fonts.googleapis.com">
+                    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
+                    <script src="https://unpkg.com/@phosphor-icons/web"><\/script>
+                    
+                    <!-- Tailwind -->
+                    <script src="https://cdn.tailwindcss.com"><\/script>
+                    <script>${tailwindConfig}<\/script>
+                    
+                    <style>
+                        body {
+                            font-family: 'Poppins', sans-serif;
+                            background-color: #ffffff;
+                            margin: 0;
+                            padding: 30px;
+                            color: #374151;
+                            /* Memaksa browser mencetak warna background dan icon */
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                        }
+                        #print-container {
+                            max-width: 800px;
+                            margin: 0 auto;
+                        }
+                        /* Mode Print CSS khusus saat dialog print terbuka */
+                        @media print {
+                            body {
+                                padding: 0;
+                                margin: 0;
+                            }
+                            @page {
+                                size: A4 portrait;
+                                margin: 15mm;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div id="print-container">
+                        ${content}
+                    </div>
+                    
+                    <script>
+                        // Menunggu resource eksternal (Tailwind CDN & Fonts) selesai dimuat sebelum memanggil print
+                        window.onload = function() {
+                            setTimeout(function() {
+                                window.print();
+                                // Opsional: tutup otomatis setelah dialog ditutup (didukung sebagian besar browser)
+                                window.onafterprint = function() {
+                                    window.close();
+                                };
+                            }, 1200); // Jeda 1.2 detik memastikan Tailwind sudah me-mapping semua kelas CSS
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            
+            // Selesaikan penulisan dokumen
+            printWindow.document.close();
+        });
+    </script>
+</body>
+</html>

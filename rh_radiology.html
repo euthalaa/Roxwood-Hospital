@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roxwood Hospital - Radiology Center</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        rx: {
+                            bg: '#080c16',
+                            card: '#101726',
+                            border: '#1e293b',
+                            accent: '#2563eb',
+                            text: '#94a3b8',
+                            title: '#e2e8f0'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #080c16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+        
+        /* Input & Select Styling overrides */
+        select, input, textarea {
+            background-color: #0b1120;
+            color: #e2e8f0;
+            border: 1px solid #1e293b;
+            outline: none;
+        }
+        select:focus, input:focus, textarea:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 1px #3b82f6;
+        }
+        
+        /* Image Viewer Zoom styling */
+        .img-container {
+            overflow: hidden;
+            position: relative;
+            cursor: crosshair;
+        }
+        #radiology-image {
+            transition: transform 0.2s ease-out;
+            transform-origin: center center;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .zoomed-in #radiology-image {
+            cursor: grab;
+        }
+        .zoomed-in #radiology-image:active {
+            cursor: grabbing;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            background: rgba(8, 12, 22, 0.85);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="bg-rx-bg text-rx-text font-sans min-h-screen flex flex-col antialiased">
+
+    <!-- Header -->
+    <header class="border-b border-rx-border bg-rx-card/50 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <img src="logoRH.png" alt="Roxwood Hospital Logo" class="w-11 h-11 object-contain rounded-md" onerror="this.outerHTML='<div class=\'w-11 h-11 rounded-md bg-rx-bg border border-rx-border flex items-center justify-center\'><i class=\'fa-solid fa-plus text-red-500 text-2xl\'></i></div>'">
+            <div>
+                <h1 class="text-rx-title font-bold text-lg leading-tight tracking-wide">ROXWOOD HOSPITAL</h1>
+                <p class="text-xs text-blue-400 font-medium tracking-widest">RADIOLOGY CENTER</p>
+            </div>
+        </div>
+        <div class="hidden md:block">
+            <span class="text-xs tracking-widest text-rx-text uppercase">Diagnostic Imaging Workstation</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 h-[calc(100vh-80px)] overflow-y-auto lg:overflow-hidden">
+        
+        <!-- Left Column: Inputs (3 cols width) -->
+        <div class="lg:col-span-3 flex flex-col gap-4 overflow-y-auto pr-1">
+            
+            <!-- Imaging Configuration -->
+            <div class="bg-rx-card border border-rx-border rounded-xl p-5 shadow-lg">
+                <h2 class="text-sm font-semibold text-blue-400 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-microchip"></i> IMAGING CONFIGURATION
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium mb-1.5">Modality</label>
+                        <select id="modality" class="w-full text-sm rounded-lg px-3 py-2.5 form-input-check appearance-none">
+                            <option value="" disabled selected>Select Modality...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label id="label-config-1" class="block text-xs font-medium mb-1.5">Category</label>
+                        <select id="config-1" class="w-full text-sm rounded-lg px-3 py-2.5 form-input-check appearance-none disabled:opacity-50" disabled>
+                            <option value="" disabled selected>Select...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label id="label-config-2" class="block text-xs font-medium mb-1.5">Body Region</label>
+                        <select id="config-2" class="w-full text-sm rounded-lg px-3 py-2.5 form-input-check appearance-none disabled:opacity-50" disabled>
+                            <option value="" disabled selected>Select...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label id="label-config-3" class="block text-xs font-medium mb-1.5">Projection / Options</label>
+                        <select id="config-3" class="w-full text-sm rounded-lg px-3 py-2.5 form-input-check appearance-none disabled:opacity-50" disabled>
+                            <option value="" disabled selected>Select...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Patient Information -->
+            <div class="bg-rx-card border border-rx-border rounded-xl p-5 shadow-lg">
+                <h2 class="text-sm font-semibold text-blue-400 mb-4 flex items-center gap-2">
+                    <i class="fa-regular fa-id-card"></i> IDENTITAS PASIEN
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium mb-1.5">Nama</label>
+                        <input type="text" id="patient-name" class="w-full text-sm rounded-lg px-3 py-2 form-input-check" placeholder="Contoh: Lucas Alexander">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1.5">Tanggal Lahir</label>
+                        <input type="date" id="patient-dob" class="w-full text-sm rounded-lg px-3 py-2 form-input-check [color-scheme:dark]">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1.5">Citizen ID</label>
+                        <input type="text" id="patient-id" class="w-full text-sm rounded-lg px-3 py-2 form-input-check" placeholder="RWX-...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Anamnesis / Kasus -->
+            <div class="bg-rx-card border border-rx-border rounded-xl p-5 shadow-lg">
+                <h2 class="text-sm font-semibold text-blue-400 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-notes-medical"></i> ANAMNESIS / KASUS
+                </h2>
+                <div>
+                    <textarea id="anamnesis" rows="3" class="w-full text-sm rounded-lg px-3 py-2 form-input-check resize-none" placeholder="Deskripsi keluhan atau kasus medis pasien..."></textarea>
+                </div>
+            </div>
+
+            <!-- Examining Doctor -->
+            <div class="bg-rx-card border border-rx-border rounded-xl p-5 shadow-lg">
+                <h2 class="text-sm font-semibold text-blue-400 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-user-doctor"></i> DOKTER PEMERIKSA
+                </h2>
+                <div>
+                    <label class="block text-xs font-medium mb-1.5">Nama Dokter</label>
+                    <input type="text" id="doctor-name" class="w-full text-sm rounded-lg px-3 py-2 form-input-check" placeholder="Dr. Name, Sp.Rad">
+                </div>
+            </div>
+
+            <!-- Generate Button -->
+            <button id="generate-btn" disabled class="w-full py-3.5 rounded-xl text-sm font-bold tracking-wide transition-all duration-300 flex items-center justify-center gap-2 bg-gray-800 text-gray-500 cursor-not-allowed">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> GENERATE IMAGING
+            </button>
+        </div>
+
+        <!-- Center Column: Image Viewer (5 cols width) -->
+        <div class="lg:col-span-5 bg-rx-card border border-rx-border rounded-xl flex flex-col shadow-lg overflow-hidden relative">
+            <div class="p-4 border-b border-rx-border flex justify-between items-center bg-rx-card z-10">
+                <h2 class="text-sm font-semibold text-blue-400 flex items-center gap-2">
+                    <i class="fa-regular fa-image"></i> OUTPUT
+                </h2>
+                <div class="flex gap-2">
+                    <button id="btn-zoom" class="w-8 h-8 rounded bg-rx-bg border border-rx-border hover:bg-rx-border hover:text-white transition flex items-center justify-center text-xs disabled:opacity-50" title="Zoom In/Out" disabled>
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                    <button id="btn-fullscreen" class="w-8 h-8 rounded bg-rx-bg border border-rx-border hover:bg-rx-border hover:text-white transition flex items-center justify-center text-xs disabled:opacity-50" title="Fullscreen" disabled>
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="viewer-container" class="flex-1 bg-black relative img-container flex items-center justify-center p-4">
+                <!-- Placeholder Image -->
+                <div id="image-placeholder" class="text-center text-rx-text/50">
+                    <i class="fa-solid fa-desktop text-4xl mb-3 opacity-50"></i>
+                    <p class="text-sm">Workstation Ready.<br>Awaiting generation.</p>
+                </div>
+                
+                <!-- Actual Image -->
+                <img id="radiology-image" src="" alt="Radiology Scan" class="hidden">
+                
+                <!-- Side Marker -->
+                <div id="side-marker" class="absolute top-8 left-8 text-white text-3xl font-bold opacity-80 hidden pointer-events-none">R</div>
+
+                <!-- Loading Overlay -->
+                <div id="loading-overlay" class="absolute inset-0 loading-overlay hidden flex-col items-center justify-center z-20">
+                    <div class="w-16 h-16 border-4 border-rx-border border-t-blue-500 rounded-full animate-spin mb-6"></div>
+                    <div class="h-6 overflow-hidden relative w-64 text-center">
+                        <div id="loading-text" class="absolute inset-0 text-blue-400 font-mono text-sm tracking-widest uppercase transition-all duration-300">
+                            Initializing...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Analytics & Report (4 cols width) -->
+        <div class="lg:col-span-4 flex flex-col gap-6 overflow-y-auto pr-1">
+            
+            <!-- Imaging Analytics -->
+            <div class="bg-rx-card border border-rx-border rounded-xl shadow-lg flex-1 min-h-[250px] flex flex-col">
+                <div class="p-4 border-b border-rx-border sticky top-0 bg-rx-card rounded-t-xl z-10">
+                    <h2 class="text-sm font-semibold text-blue-400 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check"></i> IMAGING ANALYTICS
+                    </h2>
+                </div>
+                <div class="p-5 flex-1 overflow-y-auto text-sm space-y-6" id="analytics-container">
+                    <div class="flex items-center justify-center h-full text-rx-text/40">
+                        <p>No data generated yet.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Radiology Report Preview -->
+            <div class="bg-rx-card border border-rx-border rounded-xl shadow-lg flex-1 min-h-[350px] flex flex-col">
+                <div class="p-4 border-b border-rx-border sticky top-0 bg-rx-card rounded-t-xl z-10">
+                    <h2 class="text-sm font-semibold text-blue-400 flex items-center gap-2">
+                        <i class="fa-solid fa-file-medical"></i> RADIOLOGY REPORT PREVIEW
+                    </h2>
+                </div>
+                <div class="p-5 flex-1 overflow-y-auto text-xs font-mono text-rx-title/80 leading-relaxed" id="report-container">
+                    <div class="flex items-center justify-center h-full text-rx-text/40 font-sans text-sm">
+                        <p>Report will appear here.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // RIS Data Structure for Dynamic Cascading Dropdowns
+        const risData = {
+            "X-Ray": {
+                labels: ["Category", "Body Region", "Projection"],
+                data: {
+                    "Head & Neck": {
+                        "Skull": ["AP", "Lateral", "Towne"],
+                        "Facial Bone": ["Waters", "Caldwell", "Lateral"],
+                        "Orbit": ["Waters", "Caldwell"],
+                        "Sinus": ["Waters", "Caldwell", "Lateral"],
+                        "Cervical Spine": ["AP", "Lateral", "Open Mouth"]
+                    },
+                    "Spine": {
+                        "Thoracic Spine": ["AP", "Lateral"],
+                        "Lumbar Spine": ["AP", "Lateral", "L5-S1 Spot"],
+                        "Sacrum/Coccyx": ["AP", "Lateral"]
+                    },
+                    "Thorax": {
+                        "Chest": ["PA", "AP", "Lateral", "Decubitus"],
+                        "Ribs": ["AP", "Oblique"]
+                    },
+                    "Abdomen & Pelvis": {
+                        "Abdomen": ["AP Supine", "AP Upright"],
+                        "Pelvis": ["AP"]
+                    },
+                    "Upper Extremity": {
+                        "Shoulder": ["AP", "Axial", "Y-View"],
+                        "Clavicle": ["AP", "Axial"],
+                        "Scapula": ["AP", "Lateral"],
+                        "Humerus": ["AP", "Lateral"],
+                        "Elbow": ["AP", "Lateral"],
+                        "Forearm": ["AP", "Lateral"],
+                        "Wrist": ["PA", "Lateral", "Oblique"],
+                        "Hand": ["PA", "Lateral", "Oblique"],
+                        "Finger": ["PA", "Lateral", "Oblique"]
+                    },
+                    "Lower Extremity": {
+                        "Femur": ["AP", "Lateral"],
+                        "Knee": ["AP", "Lateral", "Sunrise"],
+                        "Tibia/Fibula": ["AP", "Lateral"],
+                        "Ankle": ["AP", "Mortise", "Lateral"],
+                        "Foot": ["AP", "Oblique", "Lateral"],
+                        "Toe": ["AP", "Oblique", "Lateral"]
+                    }
+                }
+            },
+            "CT Scan": {
+                labels: ["Category", "Body Region", "Options"],
+                data: {
+                    "Neuro": {
+                        "Brain": ["Tanpa Kontras", "Dengan Kontras", "Angiography"],
+                        "Head": ["Tanpa Kontras", "Dengan Kontras", "3D Recon"],
+                        "Orbit": ["Tanpa Kontras", "Dengan Kontras"],
+                        "Sinus": ["Tanpa Kontras", "Coronal Recon"],
+                        "Facial Bone": ["Tanpa Kontras", "3D Recon"]
+                    },
+                    "Thorax": {
+                        "Chest": ["Tanpa Kontras", "Dengan Kontras", "HRCT"],
+                        "Thorax": ["Tanpa Kontras", "Dengan Kontras"]
+                    },
+                    "Abdomen": {
+                        "Abdomen": ["Tanpa Kontras", "Dengan Kontras", "Triphasic"],
+                        "KUB": ["Tanpa Kontras"]
+                    },
+                    "Pelvis": {
+                        "Pelvis": ["Tanpa Kontras", "Dengan Kontras"]
+                    },
+                    "Spine": {
+                        "Whole Spine": ["Tanpa Kontras", "3D Recon"]
+                    },
+                    "Trauma": {
+                        "Whole Body Trauma": ["Trauma Protocol"]
+                    }
+                }
+            },
+            "MRI": {
+                labels: ["Category", "Body Region", "Options"],
+                data: {
+                    "Neuro": {
+                        "Brain": ["Tanpa Kontras", "Dengan Kontras", "MRA/MRV"],
+                        "Pituitary": ["Dinamic Contrast"],
+                        "IAC": ["Tanpa Kontras", "Dengan Kontras"]
+                    },
+                    "Spine": {
+                        "Cervical": ["Tanpa Kontras", "Dengan Kontras"],
+                        "Thoracic": ["Tanpa Kontras", "Dengan Kontras"],
+                        "Lumbar": ["Tanpa Kontras", "Dengan Kontras"]
+                    },
+                    "Musculoskeletal": {
+                        "Shoulder": ["Tanpa Kontras", "Arthrogram"],
+                        "Elbow": ["Tanpa Kontras"],
+                        "Wrist": ["Tanpa Kontras"],
+                        "Hip": ["Tanpa Kontras"],
+                        "Knee": ["Tanpa Kontras"],
+                        "Ankle": ["Tanpa Kontras"]
+                    },
+                    "Abdomen & Pelvis": {
+                        "Abdomen": ["Tanpa Kontras", "Dengan Kontras", "Primovist"],
+                        "Pelvis": ["Tanpa Kontras", "Dengan Kontras"],
+                        "MRCP": ["3D Sequence"]
+                    }
+                }
+            },
+            "Ultrasound": {
+                labels: ["Category", "Body Region", "Options"],
+                data: {
+                    "Abdomen": {
+                        "Liver": ["Standard", "Elastography", "Doppler"],
+                        "Gallbladder": ["Standard"],
+                        "Kidney": ["Standard", "Doppler"],
+                        "Abdomen": ["Whole Abdomen", "Upper Abdomen", "Lower Abdomen"]
+                    },
+                    "Emergency": {
+                        "FAST": ["Standard"]
+                    },
+                    "Vascular": {
+                        "Carotid Doppler": ["Standard"],
+                        "Venous Doppler": ["Upper Extremity", "Lower Extremity"]
+                    },
+                    "Obstetric & Gynecology": {
+                        "Obstetric": ["Trimester 1", "Trimester 2/3"],
+                        "Gynecology": ["Transabdominal", "Transvaginal"]
+                    },
+                    "Breast": {
+                        "Breast": ["Bilateral", "Right", "Left"]
+                    },
+                    "Thyroid": {
+                        "Thyroid": ["Standard", "Doppler"]
+                    },
+                    "Soft Tissue": {
+                        "Soft Tissue": ["Standard"]
+                    }
+                }
+            },
+            "Angiography": {
+                labels: ["Category", "Body Region", "Options"],
+                data: {
+                    "Neurovascular": { "Cerebral": ["Standard", "3D Rotational"] },
+                    "Cardiac": { "Coronary": ["Diagnostic", "Intervention"] },
+                    "Thoracic": { "Pulmonary": ["Standard"] },
+                    "Abdominal": { "Renal": ["Standard"], "Aorta": ["Standard"] },
+                    "Peripheral": { "Peripheral": ["Upper Extremity", "Lower Extremity"] }
+                }
+            },
+            "PET Scan": {
+                labels: ["Region", "Indication", "Tracer"],
+                data: {
+                    "Whole Body": {
+                        "Oncology": ["FDG", "PSMA", "DOTATATE"],
+                        "Neurology": ["FDG"],
+                        "Cardiology": ["FDG"]
+                    },
+                    "Brain": {
+                        "Oncology": ["FDG", "Methionine"],
+                        "Neurology": ["FDG", "Amyloid"]
+                    },
+                    "Cardiac": {
+                        "Oncology": ["FDG"],
+                        "Cardiology": ["FDG", "Rubidium-82", "Ammonia"]
+                    }
+                }
+            },
+            "Mammography": {
+                labels: ["Laterality", "Projection", "Options"],
+                data: {
+                    "Left": {
+                        "CC": ["2D", "3D Tomosynthesis"],
+                        "MLO": ["2D", "3D Tomosynthesis"],
+                        "ML": ["2D", "3D Tomosynthesis"],
+                        "LM": ["2D", "3D Tomosynthesis"]
+                    },
+                    "Right": {
+                        "CC": ["2D", "3D Tomosynthesis"],
+                        "MLO": ["2D", "3D Tomosynthesis"],
+                        "ML": ["2D", "3D Tomosynthesis"],
+                        "LM": ["2D", "3D Tomosynthesis"]
+                    },
+                    "Bilateral": {
+                        "CC": ["2D", "3D Tomosynthesis"],
+                        "MLO": ["2D", "3D Tomosynthesis"],
+                        "ML": ["2D", "3D Tomosynthesis"],
+                        "LM": ["2D", "3D Tomosynthesis"]
+                    }
+                }
+            },
+            "Fluoroscopy": {
+                labels: ["Category", "Body Region", "Options"],
+                data: {
+                    "Gastrointestinal": {
+                        "Upper GI": ["Barium Swallow", "Water Soluble"],
+                        "Lower GI": ["Barium Enema"],
+                        "Barium Swallow": ["Standard"],
+                        "ERCP": ["Standard"]
+                    },
+                    "Genitourinary": {
+                        "VCUG": ["Standard", "Retrograde"]
+                    },
+                    "Musculoskeletal": {
+                        "Arthrogram": ["Shoulder", "Hip", "Knee"]
+                    },
+                    "Gynecology": {
+                        "HSG": ["Standard"]
+                    }
+                }
+            },
+            "DEXA Scan": {
+                labels: ["Category", "Body Region", "Options"],
+                data: {
+                    "Bone Densitometry": {
+                        "Whole Body": ["Standard"],
+                        "Lumbar Spine & Femur": ["Standard"],
+                        "Forearm": ["Standard"]
+                    }
+                }
+            }
+        };
+
+        // DOM Elements
+        const modalitySelect = document.getElementById('modality');
+        const config1Select = document.getElementById('config-1');
+        const config2Select = document.getElementById('config-2');
+        const config3Select = document.getElementById('config-3');
+        const labelConfig1 = document.getElementById('label-config-1');
+        const labelConfig2 = document.getElementById('label-config-2');
+        const labelConfig3 = document.getElementById('label-config-3');
+        
+        const generateBtn = document.getElementById('generate-btn');
+        const formInputs = document.querySelectorAll('.form-input-check');
+        
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingText = document.getElementById('loading-text');
+        
+        const imagePlaceholder = document.getElementById('image-placeholder');
+        const radiologyImage = document.getElementById('radiology-image');
+        const sideMarker = document.getElementById('side-marker');
+        const btnZoom = document.getElementById('btn-zoom');
+        const btnFullscreen = document.getElementById('btn-fullscreen');
+        const viewerContainer = document.getElementById('viewer-container');
+
+        const analyticsContainer = document.getElementById('analytics-container');
+        const reportContainer = document.getElementById('report-container');
+
+        // Initialize Modality Dropdown
+        function initDropdowns() {
+            Object.keys(risData).forEach(modality => {
+                const option = document.createElement('option');
+                option.value = modality;
+                option.textContent = modality;
+                modalitySelect.appendChild(option);
+            });
+        }
+
+        // Cascading Logic - Modality Change (Level 1)
+        modalitySelect.addEventListener('change', function() {
+            const modality = this.value;
+            const data = risData[modality];
+            
+            // Update Dynamic Labels based on Modality
+            labelConfig1.textContent = data.labels[0];
+            labelConfig2.textContent = data.labels[1];
+            labelConfig3.textContent = data.labels[2];
+            
+            // Reset and Populate Config 1 (Category/Region/Laterality)
+            config1Select.innerHTML = `<option value="" disabled selected>Select ${data.labels[0]}...</option>`;
+            config1Select.disabled = false;
+            Object.keys(data.data).forEach(key => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = key;
+                config1Select.appendChild(option);
+            });
+
+            // Reset and Disable Config 2 & 3
+            config2Select.innerHTML = `<option value="" disabled selected>Select ${data.labels[1]}...</option>`;
+            config2Select.disabled = true;
+            
+            config3Select.innerHTML = `<option value="" disabled selected>Select ${data.labels[2]}...</option>`;
+            config3Select.disabled = true;
+            
+            checkFormValidity();
+        });
+
+        // Cascading Logic - Config 1 Change (Level 2)
+        config1Select.addEventListener('change', function() {
+            const modality = modalitySelect.value;
+            const val1 = this.value;
+            const data2 = risData[modality].data[val1];
+            
+            // Reset and Populate Config 2 (Body Region/Indication/Projection)
+            config2Select.innerHTML = `<option value="" disabled selected>Select ${risData[modality].labels[1]}...</option>`;
+            config2Select.disabled = false;
+            Object.keys(data2).forEach(key => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = key;
+                config2Select.appendChild(option);
+            });
+            
+            // Reset and Disable Config 3
+            config3Select.innerHTML = `<option value="" disabled selected>Select ${risData[modality].labels[2]}...</option>`;
+            config3Select.disabled = true;
+            
+            checkFormValidity();
+        });
+
+        // Cascading Logic - Config 2 Change (Level 3)
+        config2Select.addEventListener('change', function() {
+            const modality = modalitySelect.value;
+            const val1 = config1Select.value;
+            const val2 = this.value;
+            const data3 = risData[modality].data[val1][val2];
+            
+            // Reset and Populate Config 3 (Projection/Tracer/Options)
+            config3Select.innerHTML = `<option value="" disabled selected>Select ${risData[modality].labels[2]}...</option>`;
+            config3Select.disabled = false;
+            data3.forEach(val => {
+                const option = document.createElement('option');
+                option.value = val;
+                option.textContent = val;
+                config3Select.appendChild(option);
+            });
+            
+            checkFormValidity();
+        });
+
+        // Form Validation
+        function checkFormValidity() {
+            let isValid = true;
+            formInputs.forEach(input => {
+                if (input.tagName === 'SELECT') {
+                    if (input.value === '' && !input.disabled) isValid = false;
+                } else {
+                    if (input.value.trim() === '') isValid = false;
+                }
+            });
+
+            if (isValid) {
+                generateBtn.disabled = false;
+                generateBtn.classList.remove('bg-gray-800', 'text-gray-500', 'cursor-not-allowed');
+                generateBtn.classList.add('bg-rx-accent', 'text-white', 'hover:bg-blue-500', 'shadow-[0_0_15px_rgba(37,99,235,0.4)]');
+            } else {
+                generateBtn.disabled = true;
+                generateBtn.classList.add('bg-gray-800', 'text-gray-500', 'cursor-not-allowed');
+                generateBtn.classList.remove('bg-rx-accent', 'text-white', 'hover:bg-blue-500', 'shadow-[0_0_15px_rgba(37,99,235,0.4)]');
+            }
+        }
+
+        formInputs.forEach(input => {
+            input.addEventListener('input', checkFormValidity);
+            input.addEventListener('change', checkFormValidity);
+        });
+
+        // Initial Setup
+        initDropdowns();
+
+        // API Calls
+        const API_KEY = ""; // Provided by Canvas environment
+
+        async function fetchTextData(inputs) {
+            // Update model ke versi gemini-3-flash-preview yang stabil
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${API_KEY}`;
+            
+            const prompt = `This is a professional medical simulation for educational purposes.
+            Act as an experienced Senior Radiologist at Roxwood Hospital. Generate a highly professional, systematic radiology reading based on the following workstation inputs:
+            
+            Patient: ${inputs.patientName}
+            DOB: ${inputs.dob}
+            ID: ${inputs.patientId}
+            Clinical Indication/Anamnesis: ${inputs.anamnesis}
+            Modality: ${inputs.modality}
+            ${inputs.config1Label}: ${inputs.config1}
+            ${inputs.config2Label}: ${inputs.config2}
+            ${inputs.config3Label}: ${inputs.config3}
+            Examining Doctor: ${inputs.doctor}
+            
+            STRICT GUIDELINES FOR MEDICAL REPORT:
+            1. Writing Style: Use Bahasa Indonesia yang baku sesuai EYD. Use professional medical terminology. Avoid English unless it is an accepted medical term. Do not use emojis. Maintain an objective tone. Never exaggerate findings. Do not speculate beyond the image.
+            2. Logic: The generated report must resemble a report written by an experienced radiologist. Describe findings systematically from normal structures to abnormal findings. Always mention normal structures when appropriate. Ensure consistency between Findings, Impression, Diagnosis, and Recommendation. The Diagnosis must always be supported by the Findings. Recommendations should logically follow the Diagnosis. PENTING: Jika diagnosis memerlukan tindakan operatif/pembedahan, bagian Rekomendasi WAJIB menyertakan penjelasan mengenai risiko komplikasi klinis yang spesifik secara medis apabila tindakan operatif tersebut ditunda atau tidak segera dilakukan. Do not generate contradictory statements. The output should be suitable for inclusion in a hospital medical record.
+            3. Formatting:
+               - The 'report_text' must strictly contain ONLY these uppercase headers: TECHNIQUE, FINDINGS, IMPRESSION, RECOMMENDATION.
+               - Write FINDINGS in paragraph form, NOT bullet points (unless multiple distinct findings exist).
+            
+            Output MUST be valid JSON conforming to this schema:
+            {
+                "findings": ["Point temuan singkat 1", "Point temuan singkat 2"],
+                "diagnosis": "Clear clinical diagnosis based on findings",
+                "recommendations": ["Rekomendasi 1", "Rekomendasi 2"],
+                "report_text": "Full structured formal radiology report text containing sections: TECHNIQUE, FINDINGS, IMPRESSION, RECOMMENDATION."
+            }`;
+
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json"
+                }
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            // Mencegah crash jika API gagal
+            if (!response.ok) throw new Error(`Text API Failed: ${response.status}`);
+            
+            const result = await response.json();
+            return JSON.parse(result.candidates[0].content.parts[0].text);
+        }
+
+        async function fetchImageData(inputs, diagnosisText) {
+            // Update model ke versi imagen-4.0-generate-001 yang paling mutakhir dan stabil
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${API_KEY}`;
+            
+            let prompt = "";
+            if (inputs.modality === "Ultrasound" && inputs.config1 === "Obstetric & Gynecology") {
+                prompt = `Textless, pure grayscale clinical Ultrasound scan of ${inputs.config2}. Clinical context: ${inputs.anamnesis}. Absolutely NO text, NO numbers, NO measurement lines.`;
+            } else {
+                prompt = `Realistic clinical ${inputs.modality} scan of ${inputs.config2} ${inputs.config3}. Diagnosis: ${diagnosisText}. Clean image, NO text, NO labels, NO UI elements, NO patient data.`;
+            }
+
+            const payload = { 
+                instances: { prompt: prompt }, 
+                parameters: { sampleCount: 1 } 
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            // Mencegah crash jika API gagal
+            if (!response.ok) throw new Error(`Image API Failed: ${response.status}`);
+            
+            const result = await response.json();
+            return `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+        }
+
+        // Main Generate Process
+        generateBtn.addEventListener('click', async () => {
+            // Disable UI during processing
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> PROCESSING...';
+            
+            // Collect Inputs dynamically based on cascading logic
+            const inputs = {
+                modality: document.getElementById('modality').value,
+                config1Label: labelConfig1.textContent,
+                config1: config1Select.value,
+                config2Label: labelConfig2.textContent,
+                config2: config2Select.value,
+                config3Label: labelConfig3.textContent,
+                config3: config3Select.value,
+                patientName: document.getElementById('patient-name').value,
+                dob: document.getElementById('patient-dob').value,
+                patientId: document.getElementById('patient-id').value,
+                anamnesis: document.getElementById('anamnesis').value,
+                doctor: document.getElementById('doctor-name').value,
+            };
+
+            // Show Loading
+            imagePlaceholder.classList.add('hidden');
+            radiologyImage.classList.add('hidden');
+            sideMarker.classList.add('hidden');
+            loadingOverlay.classList.remove('hidden');
+            loadingOverlay.classList.add('flex');
+            
+            // Loading Sequence Logic
+            const sequences = [
+                { text: "Uploading...", duration: 800 },
+                { text: "Generating Medical Imaging...", duration: 0 }, // Wait for API
+                { text: "AI Analysis...", duration: 0 }, // Wait for API
+                { text: "Generating Report...", duration: 1000 },
+                { text: "Completed.", duration: 500 }
+            ];
+
+            const updateLoadingText = (text) => {
+                loadingText.style.opacity = 0;
+                setTimeout(() => {
+                    loadingText.textContent = text;
+                    loadingText.style.opacity = 1;
+                }, 150);
+            };
+
+            try {
+                // Step 1
+                updateLoadingText(sequences[0].text);
+                await new Promise(r => setTimeout(r, sequences[0].duration));
+
+                // Step 2 & 3: Parallel API Calls (mostly)
+                // We fetch text first to get the diagnosis to feed into the image generator for accuracy
+                updateLoadingText(sequences[2].text); 
+                const textData = await fetchTextData(inputs);
+
+                updateLoadingText(sequences[1].text);
+                const imageUrl = await fetchImageData(inputs, textData.diagnosis);
+
+                // Step 4
+                updateLoadingText(sequences[3].text);
+                await new Promise(r => setTimeout(r, sequences[3].duration));
+
+                // Step 5
+                updateLoadingText(sequences[4].text);
+                await new Promise(r => setTimeout(r, sequences[4].duration));
+
+                // Render UI Updates
+                renderOutput(imageUrl, textData, inputs);
+
+            } catch (error) {
+                console.error("Processing Error:", error);
+                loadingText.textContent = "ERROR OCCURRED.";
+                loadingText.classList.replace('text-blue-400', 'text-red-500');
+                await new Promise(r => setTimeout(r, 2000));
+                
+                loadingOverlay.classList.add('hidden');
+                loadingOverlay.classList.remove('flex');
+                imagePlaceholder.classList.remove('hidden');
+                loadingText.classList.replace('text-red-500', 'text-blue-400'); // reset
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> GENERATE IMAGING';
+            }
+        });
+
+        function renderOutput(imageUrl, textData, inputs) {
+            // Hide Loader
+            loadingOverlay.classList.add('hidden');
+            loadingOverlay.classList.remove('flex');
+            
+            // Set Image
+            radiologyImage.src = imageUrl;
+            radiologyImage.classList.remove('hidden');
+            
+            // Show marker based on side (dummy logic for visual based on any config containing Right/Left)
+            const combinedConfigs = `${inputs.config1} ${inputs.config2} ${inputs.config3}`.toLowerCase();
+            if(combinedConfigs.includes('right') || combinedConfigs.includes('kanan')) {
+                sideMarker.textContent = 'R';
+                sideMarker.classList.remove('hidden');
+            } else if (combinedConfigs.includes('left') || combinedConfigs.includes('kiri')) {
+                sideMarker.textContent = 'L';
+                sideMarker.classList.remove('hidden');
+            } else {
+                sideMarker.textContent = 'R'; // Default to R for workstation aesthetic
+                sideMarker.classList.remove('hidden');
+            }
+
+            // Enable Controls
+            btnZoom.disabled = false;
+            btnFullscreen.disabled = false;
+
+            // Render Analytics
+            analyticsContainer.innerHTML = `
+                <div class="space-y-5">
+                    <div>
+                        <h3 class="flex items-center gap-2 text-green-400 font-semibold mb-2 text-xs uppercase tracking-wider">
+                            <i class="fa-solid fa-circle-check"></i> Findings
+                        </h3>
+                        <ul class="list-disc list-outside ml-6 space-y-1 text-rx-title/90">
+                            ${textData.findings.map(f => `<li>${f}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="flex items-center gap-2 text-yellow-400 font-semibold mb-2 text-xs uppercase tracking-wider">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Diagnosis
+                        </h3>
+                        <p class="text-rx-title/90 ml-6 font-medium">${textData.diagnosis}</p>
+                    </div>
+                    <div>
+                        <h3 class="flex items-center gap-2 text-purple-400 font-semibold mb-2 text-xs uppercase tracking-wider">
+                            <i class="fa-solid fa-clipboard-list"></i> Recommendation
+                        </h3>
+                        <ul class="list-disc list-outside ml-6 space-y-1 text-rx-title/90">
+                            ${textData.recommendations.map(r => `<li>${r}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+
+            // Format Report Text Sections automatically to ensure uniform styling
+            let formattedReportText = textData.report_text
+                .replace(/\**TECHNIQUE:?\**/gi, '<span class="font-bold text-blue-400 block mt-4 mb-1 border-b border-rx-border/40 pb-1">TECHNIQUE</span>')
+                .replace(/\**FINDINGS:?\**/gi, '<span class="font-bold text-blue-400 block mt-4 mb-1 border-b border-rx-border/40 pb-1">FINDINGS</span>')
+                .replace(/\**IMPRESSION:?\**/gi, '<span class="font-bold text-blue-400 block mt-4 mb-1 border-b border-rx-border/40 pb-1">IMPRESSION</span>')
+                .replace(/\**RECOMMENDATION:?\**/gi, '<span class="font-bold text-blue-400 block mt-4 mb-1 border-b border-rx-border/40 pb-1">RECOMMENDATION</span>');
+
+            // Render Report
+            const formattedDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+            reportContainer.innerHTML = `
+                <div class="font-mono text-xs leading-relaxed text-rx-title/90">
+                    <div class="text-center font-bold text-sm mb-5 tracking-widest border-b-2 border-rx-border/80 pb-3">
+                        ROXWOOD HOSPITAL<br>
+                        <span class="text-blue-400 text-xs">DEPARTMENT OF RADIOLOGY</span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <span class="font-bold text-blue-400 block mb-1 border-b border-rx-border/40 pb-1">PATIENT</span>
+                        <div class="grid grid-cols-[120px_1fr] gap-x-2">
+                            <span class="text-rx-text">Name</span><span class="font-medium">: ${inputs.patientName || 'UNSPECIFIED'}</span>
+                            <span class="text-rx-text">DOB</span><span class="font-medium">: ${inputs.dob || 'UNSPECIFIED'}</span>
+                            <span class="text-rx-text">Citizen ID</span><span class="font-medium">: ${inputs.patientId || 'UNSPECIFIED'}</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <span class="font-bold text-blue-400 block mb-1 border-b border-rx-border/40 pb-1">EXAMINATION</span>
+                        <div class="grid grid-cols-[120px_1fr] gap-x-2">
+                            <span class="text-rx-text">Modality</span><span class="font-medium">: ${inputs.modality}</span>
+                            <span class="text-rx-text">${inputs.config1Label}</span><span class="font-medium">: ${inputs.config1}</span>
+                            <span class="text-rx-text">${inputs.config2Label}</span><span class="font-medium">: ${inputs.config2}</span>
+                            <span class="text-rx-text">${inputs.config3Label}</span><span class="font-medium">: ${inputs.config3}</span>
+                            <span class="text-rx-text">Indication</span><span class="font-medium">: ${inputs.anamnesis || '-'}</span>
+                            <span class="text-rx-text">Date</span><span class="font-medium">: ${formattedDate}</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-6 whitespace-pre-wrap">${formattedReportText.trim()}</div>
+
+                    <div class="mt-8 pt-4 border-t-2 border-rx-border/80 flex justify-end">
+                        <div class="text-center min-w-[220px]">
+                            <p class="font-bold text-blue-400 mb-4 text-[10px] tracking-wider uppercase">DOCTOR SIGNATURE</p>
+                            <p class="italic font-serif text-rx-title/60 mb-2 text-xl" style="font-family: 'Georgia', serif;">Signed Electronically</p>
+                            <p class="font-bold border-t border-rx-border/80 pt-2 inline-block min-w-[150px] uppercase">${inputs.doctor || 'Dr. Roxwood, Sp.Rad'}</p>
+                            <p class="text-rx-text/60 text-[10px] mt-1 uppercase tracking-wide">Senior Radiologist<br>Roxwood Hospital</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Image Viewer Controls
+        let isZoomed = false;
+        let scale = 1;
+        let panning = false;
+        let pointX = 0;
+        let pointY = 0;
+        let startX = 0;
+        let startY = 0;
+
+        btnZoom.addEventListener('click', () => {
+            isZoomed = !isZoomed;
+            if (isZoomed) {
+                scale = 2;
+                radiologyImage.style.transform = `scale(${scale}) translate(${pointX}px, ${pointY}px)`;
+                viewerContainer.classList.add('zoomed-in');
+                btnZoom.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+            } else {
+                scale = 1;
+                pointX = 0;
+                pointY = 0;
+                radiologyImage.style.transform = `scale(${scale}) translate(0px, 0px)`;
+                viewerContainer.classList.remove('zoomed-in');
+                btnZoom.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+            }
+        });
+
+        // Panning Logic when Zoomed
+        viewerContainer.addEventListener('mousedown', (e) => {
+            if (!isZoomed) return;
+            e.preventDefault();
+            startX = e.clientX - pointX;
+            startY = e.clientY - pointY;
+            panning = true;
+        });
+
+        viewerContainer.addEventListener('mousemove', (e) => {
+            if (!panning || !isZoomed) return;
+            e.preventDefault();
+            pointX = e.clientX - startX;
+            pointY = e.clientY - startY;
+            
+            // Limit pan area (simple constraint)
+            const limit = 150;
+            if (pointX > limit) pointX = limit;
+            if (pointX < -limit) pointX = -limit;
+            if (pointY > limit) pointY = limit;
+            if (pointY < -limit) pointY = -limit;
+
+            radiologyImage.style.transform = `scale(${scale}) translate(${pointX}px, ${pointY}px)`;
+        });
+
+        window.addEventListener('mouseup', () => {
+            panning = false;
+        });
+
+        // Fullscreen Logic
+        btnFullscreen.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                viewerContainer.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                btnFullscreen.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+            } else {
+                btnFullscreen.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+                // reset zoom on exit fullscreen
+                if (isZoomed) btnZoom.click(); 
+            }
+        });
+
+    </script>
+</body>
+</html>
