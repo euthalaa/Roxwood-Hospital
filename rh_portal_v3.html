@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RH Portal - Roxwood Hospital</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom styles untuk transisi halaman */
+        .view-section {
+            display: none;
+            animation: fadeIn 0.25s ease-out;
+        }
+        .view-section.active {
+            display: flex;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom scrollbar */
+        pre::-webkit-scrollbar {
+            height: 6px;
+        }
+        pre::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+        }
+        pre::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 4px;
+        }
+        
+        .custom-bullet-list ul li::before {
+            content: "•";
+            color: currentColor;
+            font-weight: bold;
+            display: inline-block; 
+            width: 1em;
+            margin-left: -1em;
+        }
+        .pharmacy-card ul li::before {
+            color: #6366f1;
+        }
+        .diag-banding-list ul li::before {
+            color: #4f46e5;
+        }
+        .lab-list ul li::before {
+            color: #d97706;
+        }
+        .rad-list ul li::before {
+            color: #0891b2;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-900 flex flex-col min-h-screen">
+
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <!-- Logo -->
+                <div id="logo-btn" class="flex items-center cursor-pointer transition-transform hover:scale-105">
+                    <i data-lucide="heart-pulse" class="h-8 w-8 text-emerald-600 mr-2" stroke-width="2.5"></i>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-tight text-emerald-800 uppercase leading-none">RH Portal</h1>
+                        <p class="text-[10px] sm:text-xs text-slate-500 font-medium">Roxwood Hospital Medical Center</p>
+                    </div>
+                </div>
+
+                <!-- Nav Buttons -->
+                <nav class="flex space-x-1 sm:space-x-2 bg-slate-100 p-1 rounded-xl border border-slate-200 overflow-x-auto">
+                    <button id="nav-dashboard" class="nav-btn flex items-center px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 bg-white text-emerald-700 shadow-sm border border-slate-200">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4 mr-1 sm:mr-2"></i>
+                        <span class="hidden sm:inline">Dashboard</span>
+                    </button>
+                    <button id="nav-diagnosis" class="nav-btn flex items-center px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 text-slate-600 hover:text-emerald-600 hover:bg-white/50">
+                        <i data-lucide="stethoscope" class="w-4 h-4 mr-1 sm:mr-2"></i>
+                        <span class="hidden sm:inline">AI Diagnosis</span>
+                    </button>
+                    <button id="nav-surgery" class="nav-btn flex items-center px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 text-slate-600 hover:text-emerald-600 hover:bg-white/50">
+                        <i data-lucide="syringe" class="w-4 h-4 mr-1 sm:mr-2"></i>
+                        <span class="hidden sm:inline">AI Surgery</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        
+        <!-- ================= DASHBOARD VIEW ================= -->
+        <div id="view-dashboard" class="view-section active w-full items-center justify-center h-full min-h-[60vh] flex-col">
+            <div class="bg-white rounded-3xl p-8 md:p-16 max-w-3xl w-full text-center border border-slate-200 shadow-sm transition-all hover:shadow-md">
+                <!-- Icon Circle -->
+                <div class="mx-auto w-24 h-24 bg-gradient-to-br from-emerald-50 to-teal-100 rounded-full flex items-center justify-center mb-8 border border-emerald-200 shadow-inner">
+                    <div class="relative">
+                        <i data-lucide="clipboard-list" class="w-12 h-12 text-emerald-700" stroke-width="1.5"></i>
+                        <div class="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
+                            <i data-lucide="heart-pulse" class="w-5 h-5 text-emerald-500"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Title & Desc -->
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-6 tracking-tight">RH Digital Hub</h2>
+                <p class="text-slate-500 text-base md:text-lg mb-10 max-w-xl mx-auto leading-relaxed">
+                    Sistem asisten medis terintegrasi untuk staf Roxwood Hospital. Akses fitur
+                    diagnosa otomatis dan perencanaan bedah cerdas untuk meningkatkan
+                    efisiensi pelayanan pasien.
+                </p>
+
+                <!-- Actions -->
+                <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <button id="dash-btn-diagnosis" class="flex items-center justify-center px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold shadow-md transition-all duration-200 transform hover:-translate-y-0.5">
+                        <i data-lucide="wand-2" class="w-5 h-5 mr-2"></i>
+                        Mulai Diagnosis
+                    </button>
+                    <button id="dash-btn-surgery" class="flex items-center justify-center px-6 py-3.5 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl font-semibold shadow-sm transition-all duration-200 transform hover:-translate-y-0.5">
+                        <i data-lucide="plus-square" class="w-5 h-5 mr-2 text-indigo-500"></i>
+                        Rencana Bedah
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= AI DIAGNOSIS VIEW ================= -->
+        <div id="view-diagnosis" class="view-section w-full max-w-4xl mx-auto flex-col space-y-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                <div class="flex items-center space-x-3 mb-6 border-b border-slate-100 pb-4">
+                    <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                        <i data-lucide="stethoscope" class="w-6 h-6 text-blue-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">AI Diagnosis Assistant</h2>
+                        <p class="text-sm text-slate-500">Masukkan anamnesis pasien untuk mendapatkan analisis dari Dokter Senior IGD.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Anamnesis / Temuan Medis / Kondisi Fisik</label>
+                        <textarea id="diag-input" class="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-slate-50 hover:bg-white transition-all min-h-[120px] outline-none" placeholder="Contoh: Pasien laki-laki tertembak di perut bagian kanan, pendarahan hebat, tidak sadarkan diri, napas dangkal..."></textarea>
+                    </div>
+
+                    <div id="diag-error" class="hidden p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded-r-lg shadow-sm"></div>
+
+                    <div class="flex justify-end">
+                        <button id="diag-btn" class="flex items-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold shadow-md transition-all disabled:bg-emerald-400 disabled:cursor-not-allowed">
+                            <i id="diag-btn-icon" data-lucide="activity-square" class="w-5 h-5 mr-2"></i>
+                            <i id="diag-btn-spinner" data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin hidden"></i>
+                            <span id="diag-btn-text">Analisis Diagnosis</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hasil Diagnosis -->
+            <div id="diag-result-card" class="hidden bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center border-b border-slate-100 pb-4">
+                    <i data-lucide="clipboard-list" class="w-5 h-5 mr-2 text-emerald-600"></i>
+                    Laporan Medis IGD
+                </h3>
+                
+                <!-- Diagnosis Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                    <div class="lg:col-span-2 space-y-4">
+                        <div class="bg-emerald-50 rounded-xl p-5 border border-emerald-100 shadow-sm h-full">
+                            <h4 class="text-xs font-bold text-emerald-800 uppercase mb-2 flex items-center">
+                                <i data-lucide="activity" class="w-4 h-4 mr-1"></i> Diagnosis Utama
+                            </h4>
+                            <p id="res-diag-main" class="text-slate-800 font-bold text-lg">-</p>
+                            
+                            <h4 class="text-xs font-bold text-indigo-800 uppercase mt-4 mb-2 flex items-center border-t border-emerald-200/50 pt-3">
+                                <i data-lucide="git-branch" class="w-4 h-4 mr-1"></i> Diagnosis Banding
+                            </h4>
+                            <div class="custom-bullet-list diag-banding-list">
+                                <ul id="res-diag-banding" class="text-sm text-slate-700 pl-4 space-y-1 font-medium">
+                                    <!-- Dynamic -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-50 rounded-xl p-5 border border-blue-100 shadow-sm h-full flex flex-col justify-center items-center text-center">
+                        <h4 class="text-xs font-bold text-blue-800 uppercase mb-3 flex items-center justify-center">
+                            <i data-lucide="calculator" class="w-4 h-4 mr-1"></i> GCS Score
+                        </h4>
+                        <p id="res-diag-gcs" class="text-2xl text-slate-800 font-bold font-mono bg-white inline-block px-4 py-2 rounded-xl border border-blue-200 shadow-sm w-full">-</p>
+                    </div>
+                </div>
+
+                <!-- TTV Section -->
+                <div class="mb-6">
+                    <h4 class="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Tanda-tanda Vital (TTV)</h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center shadow-sm">
+                            <p class="text-xs text-slate-500 mb-1">Tekanan Darah</p>
+                            <p id="res-diag-td" class="font-bold text-slate-800">-</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center shadow-sm">
+                            <p class="text-xs text-slate-500 mb-1">Nadi / HR</p>
+                            <p id="res-diag-hr" class="font-bold text-slate-800">-</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center shadow-sm">
+                            <p class="text-xs text-slate-500 mb-1">Suhu</p>
+                            <p id="res-diag-temp" class="font-bold text-slate-800">-</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center shadow-sm">
+                            <p class="text-xs text-slate-500 mb-1">Respirasi / RR</p>
+                            <p id="res-diag-rr" class="font-bold text-slate-800">-</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recommendation Section -->
+                <div class="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-amber-50 rounded-xl p-5 border border-amber-100 shadow-sm">
+                        <h4 class="text-xs font-bold text-amber-800 uppercase mb-3 flex items-center">
+                            <i data-lucide="test-tube-2" class="w-4 h-4 mr-2"></i> Rekomendasi Laboratorium
+                        </h4>
+                        <div class="custom-bullet-list lab-list">
+                            <ul id="res-diag-lab" class="text-sm text-slate-700 pl-4 space-y-1 font-medium">
+                                <!-- Dynamic -->
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="bg-cyan-50 rounded-xl p-5 border border-cyan-100 shadow-sm">
+                        <h4 class="text-xs font-bold text-cyan-800 uppercase mb-3 flex items-center">
+                            <i data-lucide="scan" class="w-4 h-4 mr-2"></i> Rekomendasi Radiologi
+                        </h4>
+                        <div class="custom-bullet-list rad-list">
+                            <ul id="res-diag-rad" class="text-sm text-slate-700 pl-4 space-y-1 font-medium">
+                                <!-- Dynamic -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency / BLS Section -->
+                <div id="res-diag-emergency-container" class="hidden mb-8">
+                    <h4 class="text-sm font-bold text-red-700 mb-4 uppercase flex items-center tracking-wider bg-red-50 p-2 rounded-lg border border-red-100 inline-flex">
+                        <i data-lucide="siren" class="w-4 h-4 mr-2 animate-pulse text-red-600"></i>
+                        Penanganan Emergency (BLS & Initial Care)
+                    </h4>
+                    <div id="res-diag-emergency-list" class="space-y-3">
+                        <!-- Emergency steps injected here -->
+                    </div>
+                </div>
+
+                <!-- Roleplay Guide Section -->
+                <div class="bg-slate-800 text-slate-200 rounded-xl p-5 shadow-inner">
+                    <h4 class="text-sm font-bold text-slate-400 mb-3 uppercase tracking-wider flex items-center">
+                        <i data-lucide="terminal" class="w-4 h-4 mr-2"></i> Catatan Medis & Roleplay
+                    </h4>
+                    <pre id="res-diag-rp" class="whitespace-pre-wrap font-mono text-sm overflow-x-auto text-emerald-400 leading-relaxed">-</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= AI SURGERY VIEW ================= -->
+        <div id="view-surgery" class="view-section w-full max-w-5xl mx-auto flex-col space-y-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                <div class="flex items-center space-x-3 mb-6 border-b border-slate-100 pb-4">
+                    <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100">
+                        <i data-lucide="syringe" class="w-6 h-6 text-indigo-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">AI Surgery Planner</h2>
+                        <p class="text-sm text-slate-500">Buat rencana tindakan bedah (Operative Note) dan farmakoterapi yang komprehensif.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Jenis Operasi</label>
+                            <select id="surg-type" class="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 hover:bg-white transition-all outline-none">
+                                <option value="Mayor">Mayor</option>
+                                <option value="Minor">Minor</option>
+                            </select>
+                            <p class="text-xs text-slate-500 mt-2">*Minor: Anestesi lokal, GCS >13, durasi singkat.</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Jenis Anestesi</label>
+                            <select id="surg-anesthesia" class="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 hover:bg-white transition-all outline-none">
+                                <option value="Umum">Umum (General)</option>
+                                <option value="Lokal">Lokal</option>
+                                <option value="Spinal">Spinal (Regional)</option>
+                                <option value="Sedasi Sedang">Sedasi Sedang (Conscious Sedation)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Kasus Medis / Tindakan yang Diperlukan</label>
+                        <textarea id="surg-input" class="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 hover:bg-white transition-all min-h-[120px] outline-none" placeholder="Contoh: Operasi bypass arteri koroner pada pasien serangan jantung, riwayat hipertensi..."></textarea>
+                    </div>
+
+                    <div id="surg-error" class="hidden p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded-r-lg shadow-sm"></div>
+
+                    <div class="flex justify-end">
+                        <button id="surg-btn" class="flex items-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold shadow-md transition-all disabled:bg-indigo-400 disabled:cursor-not-allowed">
+                            <i id="surg-btn-icon" data-lucide="wand-2" class="w-5 h-5 mr-2"></i>
+                            <i id="surg-btn-spinner" data-lucide="loader-2" class="w-5 h-5 mr-2 animate-spin hidden"></i>
+                            <span id="surg-btn-text">Rancang Operasi & Farmakologi</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hasil Plan Bedah -->
+            <div id="surg-result-card" class="hidden bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-4 mb-6">
+                    <h3 class="text-xl font-bold text-slate-800 flex items-center mb-3 sm:mb-0">
+                        <i data-lucide="file-text" class="w-5 h-5 mr-2 text-indigo-600"></i>
+                        Catatan Pra-Operatif & Operatif
+                    </h3>
+                    
+                    <div class="bg-amber-50 rounded-lg px-4 py-2 border border-amber-200 flex items-center shadow-sm">
+                        <i data-lucide="calendar-clock" class="w-4 h-4 mr-2 text-amber-600"></i>
+                        <span class="text-xs font-bold text-amber-800 uppercase mr-2">Durasi:</span>
+                        <span id="res-surg-schedule" class="text-amber-900 text-sm font-semibold">-</span>
+                    </div>
+                </div>
+                
+                <!-- Pharmacology Structured UI -->
+                <div class="mb-8">
+                    <h4 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wider flex items-center">
+                        <i data-lucide="pill" class="w-4 h-4 mr-2 text-indigo-500"></i>
+                        Protokol Farmakologi (Obat-obatan)
+                    </h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4" id="res-surg-pharmacology">
+                        <!-- Pre-Op -->
+                        <div class="custom-bullet-list pharmacy-card bg-slate-50 border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
+                            <div class="bg-indigo-100 px-4 py-2 border-b border-indigo-200">
+                                <h5 class="text-xs font-bold text-indigo-800 uppercase">Pra-Operatif</h5>
+                            </div>
+                            <div class="p-4 flex-grow">
+                                <ul id="pharma-pre-op" class="text-sm text-slate-700 space-y-3 pl-4">
+                                    <!-- Dynamic -->
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Intra-Op -->
+                        <div class="custom-bullet-list pharmacy-card bg-slate-50 border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
+                            <div class="bg-blue-100 px-4 py-2 border-b border-blue-200">
+                                <h5 class="text-xs font-bold text-blue-800 uppercase">Intra-Operatif</h5>
+                            </div>
+                            <div class="p-4 flex-grow">
+                                <ul id="pharma-intra-op" class="text-sm text-slate-700 space-y-3 pl-4">
+                                    <!-- Dynamic -->
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Post-Op -->
+                        <div class="custom-bullet-list pharmacy-card bg-slate-50 border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
+                            <div class="bg-emerald-100 px-4 py-2 border-b border-emerald-200">
+                                <h5 class="text-xs font-bold text-emerald-800 uppercase">Post-Operatif</h5>
+                            </div>
+                            <div class="p-4 flex-grow">
+                                <ul id="pharma-post-op" class="text-sm text-slate-700 space-y-3 pl-4">
+                                    <!-- Dynamic -->
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Discharge -->
+                        <div class="custom-bullet-list pharmacy-card bg-slate-50 border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
+                            <div class="bg-teal-100 px-4 py-2 border-b border-teal-200">
+                                <h5 class="text-xs font-bold text-teal-800 uppercase">Pemulangan (Discharge)</h5>
+                            </div>
+                            <div class="p-4 flex-grow">
+                                <ul id="pharma-discharge" class="text-sm text-slate-700 space-y-3 pl-4">
+                                    <!-- Dynamic -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Steps -->
+                <div class="mb-8">
+                    <h4 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wider flex items-center">
+                        <i data-lucide="activity-square" class="w-4 h-4 mr-2 text-slate-500"></i>
+                        Tahapan Prosedur Bedah
+                    </h4>
+                    <div id="res-surg-steps" class="space-y-4">
+                        <!-- Steps injected here -->
+                    </div>
+                </div>
+                
+                <!-- Post-Op Risks -->
+                <div class="mb-8">
+                    <h4 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wider flex items-center">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 mr-2 text-rose-500"></i>
+                        Risiko & Komplikasi Pasca-Operasi
+                    </h4>
+                    <div id="res-surg-risks" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Risks injected here -->
+                    </div>
+                </div>
+
+                <!-- Report -->
+                <div class="bg-slate-800 text-slate-200 rounded-xl p-6 relative overflow-hidden shadow-inner">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                        <i data-lucide="clipboard-signature" class="w-24 h-24"></i>
+                    </div>
+                    <h4 class="text-sm font-bold text-slate-400 mb-3 uppercase tracking-wider relative z-10 flex items-center">
+                        <i data-lucide="file-check-2" class="w-4 h-4 mr-2"></i> Laporan Medis Pasca-Operasi
+                    </h4>
+                    <p id="res-surg-report" class="text-slate-300 text-sm leading-relaxed relative z-10">-</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-sm text-slate-500">
+            <p>© 2026 Roxwood Hospital. For Medical Roleplay Purposes Only.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Inisialisasi Icons
+        lucide.createIcons();
+
+        // State Management
+        const STATE_KEY = 'rh_portal_state_v3'; // Diperbarui untuk struktur baru
+        let appState = {
+            activeTab: 'dashboard',
+            diagnosis: { input: '', result: null },
+            surgery: { input: '', type: 'Mayor', anesthesia: 'Umum', result: null }
+        };
+
+        function saveState() {
+            localStorage.setItem(STATE_KEY, JSON.stringify(appState));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem(STATE_KEY);
+            if (saved) {
+                try {
+                    appState = JSON.parse(saved);
+                    
+                    document.getElementById('diag-input').value = appState.diagnosis.input || '';
+                    if (appState.diagnosis.result) renderDiagnosisResult(appState.diagnosis.result);
+                    
+                    document.getElementById('surg-input').value = appState.surgery.input || '';
+                    if (appState.surgery.type) document.getElementById('surg-type').value = appState.surgery.type;
+                    if (appState.surgery.anesthesia) document.getElementById('surg-anesthesia').value = appState.surgery.anesthesia;
+                    if (appState.surgery.result) renderSurgeryResult(appState.surgery.result);
+                    
+                    switchTab(appState.activeTab, false);
+                } catch (e) { 
+                    console.error('Failed to load state', e); 
+                    switchTab('dashboard', false);
+                }
+            }
+        }
+
+        // Event Listeners AutoSave
+        document.getElementById('diag-input').addEventListener('input', (e) => {
+            appState.diagnosis.input = e.target.value;
+            saveState();
+        });
+        document.getElementById('surg-input').addEventListener('input', (e) => {
+            appState.surgery.input = e.target.value;
+            saveState();
+        });
+        document.getElementById('surg-type').addEventListener('change', (e) => {
+            appState.surgery.type = e.target.value;
+            saveState();
+        });
+        document.getElementById('surg-anesthesia').addEventListener('change', (e) => {
+            appState.surgery.anesthesia = e.target.value;
+            saveState();
+        });
+
+        // Tab Switching
+        function switchTab(tabId, save = true) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.className = 'nav-btn flex items-center px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 text-slate-600 hover:text-emerald-600 hover:bg-white/50';
+            });
+
+            const viewEl = document.getElementById(`view-${tabId}`);
+            if(viewEl) viewEl.classList.add('active');
+            
+            const navEl = document.getElementById(`nav-${tabId}`);
+            if(navEl) navEl.className = 'nav-btn flex items-center px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-200 bg-white text-emerald-700 shadow-sm border border-slate-200';
+            
+            if (save) {
+                appState.activeTab = tabId;
+                saveState();
+            }
+        }
+
+        // Helper untuk merender list sederhana
+        function renderSimpleList(elementId, items, emptyMsg = "Tidak ada indikasi") {
+            const ul = document.getElementById(elementId);
+            ul.innerHTML = '';
+            if (!items || items.length === 0) {
+                ul.innerHTML = `<li class="text-slate-400 italic !list-none before:content-none ml-[-1em]">${emptyMsg}</li>`;
+                return;
+            }
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.innerText = item;
+                ul.appendChild(li);
+            });
+        }
+
+        // Helper untuk merender list obat (Farmakologi)
+        function renderPharmaList(elementId, medArray) {
+            const ul = document.getElementById(elementId);
+            ul.innerHTML = '';
+            if (!medArray || medArray.length === 0) {
+                ul.innerHTML = '<li class="text-slate-400 italic !list-none before:content-none ml-[-1em]">Tidak ada (N/A)</li>';
+                return;
+            }
+            medArray.forEach(med => {
+                const li = document.createElement('li');
+                li.className = "mb-2";
+                li.innerHTML = `
+                    <span class="font-bold text-slate-800">${med.name}</span> 
+                    <span class="text-xs font-mono bg-slate-200 text-slate-700 px-1 py-0.5 rounded ml-1">${med.dosage}</span>
+                    <div class="text-xs text-slate-500 mt-0.5 leading-tight">${med.notes}</div>
+                `;
+                ul.appendChild(li);
+            });
+        }
+
+        function renderDiagnosisResult(result) {
+            // Diagnosis & TTV
+            document.getElementById('res-diag-main').innerText = result.diagnosis_utama || '-';
+            renderSimpleList('res-diag-banding', result.diagnosis_banding, 'Tidak ada diagnosis banding spesifik');
+            document.getElementById('res-diag-gcs').innerText = result.gcs || '-';
+            
+            document.getElementById('res-diag-td').innerText = result.ttv?.tekanan_darah || '-';
+            document.getElementById('res-diag-hr').innerText = result.ttv?.nadi || '-';
+            document.getElementById('res-diag-temp').innerText = result.ttv?.suhu || '-';
+            document.getElementById('res-diag-rr').innerText = result.ttv?.respirasi || '-';
+            document.getElementById('res-diag-rp').innerText = result.rp_guide || '-';
+
+            // Rekomendasi
+            renderSimpleList('res-diag-lab', result.rekomendasi?.laboratorium, 'Observasi medis standar');
+            renderSimpleList('res-diag-rad', result.rekomendasi?.radiologi, 'Tidak diperlukan saat ini');
+
+            // Emergency Steps (/me and /do)
+            const emContainer = document.getElementById('res-diag-emergency-list');
+            const emSection = document.getElementById('res-diag-emergency-container');
+            emContainer.innerHTML = '';
+            
+            if (result.emergency_steps && result.emergency_steps.length > 0) {
+                result.emergency_steps.forEach((step, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-start';
+                    div.innerHTML = `
+                        <div class="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-red-100 text-red-700 font-bold text-xs mr-3 border border-red-200">
+                            ${idx + 1}
+                        </div>
+                        <div class="bg-white p-3.5 rounded-xl border border-slate-200 w-full hover:border-red-200 hover:shadow-sm transition-all space-y-2">
+                            <p class="text-slate-700 text-sm leading-relaxed">
+                                <span class="font-mono text-indigo-600 font-bold mr-1 text-xs">/me</span> 
+                                ${step.me}
+                            </p>
+                            <p class="text-slate-600 text-sm leading-relaxed border-l-[3px] border-emerald-400 pl-3 ml-1 bg-emerald-50/50 py-1 rounded-r-md">
+                                <span class="font-mono text-emerald-700 font-bold mr-1 text-xs">/do</span> 
+                                ${step.do}
+                            </p>
+                        </div>
+                    `;
+                    emContainer.appendChild(div);
+                });
+                emSection.classList.remove('hidden');
+            } else {
+                emSection.classList.add('hidden');
+            }
+
+            document.getElementById('diag-result-card').classList.remove('hidden');
+        }
+
+        function renderSurgeryResult(result) {
+            document.getElementById('res-surg-schedule').innerText = result.schedule || '-';
+            document.getElementById('res-surg-report').innerText = result.report || '-';
+
+            // 1. Render Pharmacology
+            if (result.pharmacology) {
+                renderPharmaList('pharma-pre-op', result.pharmacology.pre_op);
+                renderPharmaList('pharma-intra-op', result.pharmacology.intra_op);
+                renderPharmaList('pharma-post-op', result.pharmacology.post_op);
+                renderPharmaList('pharma-discharge', result.pharmacology.discharge);
+            }
+
+            // 2. Render Risks
+            const risksContainer = document.getElementById('res-surg-risks');
+            risksContainer.innerHTML = '';
+            if (result.risks && result.risks.length > 0) {
+                result.risks.forEach(risk => {
+                    const div = document.createElement('div');
+                    div.className = "bg-rose-50 border border-rose-100 rounded-lg p-3 flex items-start shadow-sm";
+                    div.innerHTML = `
+                        <i data-lucide="alert-circle" class="w-4 h-4 text-rose-500 mt-0.5 mr-2 flex-shrink-0"></i>
+                        <div>
+                            <h5 class="text-sm font-bold text-rose-800 leading-tight">${risk.complication}</h5>
+                            <p class="text-xs text-rose-600 mt-1 leading-relaxed">${risk.description}</p>
+                        </div>
+                    `;
+                    risksContainer.appendChild(div);
+                });
+            } else {
+                risksContainer.innerHTML = '<div class="col-span-full text-sm text-slate-500 italic">Tidak ada komplikasi mayor terdeteksi.</div>';
+            }
+
+            // 3. Render Surgical Steps (/me and /do)
+            const stepsContainer = document.getElementById('res-surg-steps');
+            stepsContainer.innerHTML = '';
+            if (result.steps && result.steps.length > 0) {
+                result.steps.forEach((step, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-start';
+                    div.innerHTML = `
+                        <div class="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs mr-3 mt-0.5 border border-indigo-200">
+                            ${idx + 1}
+                        </div>
+                        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 w-full hover:bg-white hover:shadow-md transition-all space-y-2">
+                            <p class="text-slate-700 text-sm leading-relaxed">
+                                <span class="font-mono text-indigo-600 font-bold mr-1 text-xs">/me</span> 
+                                ${step.me}
+                            </p>
+                            <p class="text-slate-600 text-sm leading-relaxed border-l-[3px] border-emerald-400 pl-3 ml-1 bg-emerald-50/50 py-1 rounded-r-md">
+                                <span class="font-mono text-emerald-700 font-bold mr-1 text-xs">/do</span> 
+                                ${step.do}
+                            </p>
+                        </div>
+                    `;
+                    stepsContainer.appendChild(div);
+                });
+            }
+
+            document.getElementById('surg-result-card').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        async function runDiagnosis() {
+            const inputVal = document.getElementById('diag-input').value.trim();
+            const errorBox = document.getElementById('diag-error');
+            const resultCard = document.getElementById('diag-result-card');
+            const btn = document.getElementById('diag-btn');
+            
+            if (!inputVal) {
+                errorBox.innerText = "Silakan masukkan anamnesis atau keluhan pasien terlebih dahulu.";
+                errorBox.classList.remove('hidden');
+                return;
+            }
+
+            errorBox.classList.add('hidden');
+            resultCard.classList.add('hidden');
+            
+            // Loading state
+            btn.disabled = true;
+            document.getElementById('diag-btn-text').innerText = "Menganalisis...";
+            document.getElementById('diag-btn-icon').classList.add('hidden');
+            document.getElementById('diag-btn-spinner').classList.remove('hidden');
+
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const systemPrompt = "Anda adalah Dokter Senior di Instalasi Gawat Darurat (IGD) Roxwood Hospital. Berikan analisis diagnosis komprehensif berdasarkan anamnesis/temuan medis. Output WAJIB mencakup: Diagnosis Utama, Diagnosis Banding, TTV, dan Rekomendasi (Lab & Radiologi). WAJIB berikan langkah penanganan emergency (Initial Care/BLS) dalam format roleplay (/me aksi spesifik medis, /do reaksi pasien/monitor anatomi). Gunakan Bahasa Indonesia baku (EYD) dengan mempertahankan istilah medis standar.";
+            const userPrompt = `Pasien masuk dengan anamnesis/temuan: "${inputVal}".
+Berikan:
+1. Diagnosis Utama dan 2-4 Diagnosis Banding.
+2. Estimasi GCS dan TTV jika tidak disebutkan eksplisit.
+3. Penanganan Emergency (Langkah BLS/Initial Care) sebagai Dokter Senior yang menangani langsung di IGD. Tulis dalam bentuk /me (aksi menggunakan alat medis) dan /do (reaksi pasien/monitor).
+4. Rekomendasi pemeriksaan lanjutan (Laboratorium & Radiologi).
+5. Panduan roleplay umum (rp_guide).`;
+
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            diagnosis_utama: { type: "STRING" },
+                            diagnosis_banding: { type: "ARRAY", items: { type: "STRING" } },
+                            gcs: { type: "STRING" },
+                            ttv: { 
+                                type: "OBJECT", 
+                                properties: {
+                                    tekanan_darah: { type: "STRING" }, nadi: { type: "STRING" },
+                                    suhu: { type: "STRING" }, respirasi: { type: "STRING" }
+                                }
+                            },
+                            rekomendasi: {
+                                type: "OBJECT",
+                                properties: {
+                                    laboratorium: { type: "ARRAY", items: { type: "STRING" } },
+                                    radiologi: { type: "ARRAY", items: { type: "STRING" } }
+                                },
+                                required: ["laboratorium", "radiologi"]
+                            },
+                            emergency_steps: { 
+                                type: "ARRAY", 
+                                items: { 
+                                    type: "OBJECT",
+                                    properties: {
+                                        me: { type: "STRING" },
+                                        do: { type: "STRING" }
+                                    },
+                                    required: ["me", "do"]
+                                }
+                            },
+                            rp_guide: { type: "STRING" }
+                        },
+                        required: ["diagnosis_utama", "diagnosis_banding", "gcs", "ttv", "rekomendasi", "emergency_steps", "rp_guide"]
+                    }
+                }
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                const result = JSON.parse(data.candidates[0].content.parts[0].text);
+
+                renderDiagnosisResult(result);
+                appState.diagnosis.result = result;
+                saveState();
+
+            } catch (error) {
+                console.error(error);
+                errorBox.innerText = "Gagal menghubungi AI. Pastikan jaringan stabil dan coba lagi.";
+                errorBox.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                document.getElementById('diag-btn-text').innerText = "Analisis Diagnosis";
+                document.getElementById('diag-btn-icon').classList.remove('hidden');
+                document.getElementById('diag-btn-spinner').classList.add('hidden');
+            }
+        }
+
+        async function runSurgery() {
+            // ... (Kode runSurgery tetap sama seperti sebelumnya, tidak diubah fungsionalitasnya)
+            const inputVal = document.getElementById('surg-input').value.trim();
+            const typeVal = document.getElementById('surg-type').value;
+            const anesthesiaVal = document.getElementById('surg-anesthesia').value;
+            const errorBox = document.getElementById('surg-error');
+            const resultCard = document.getElementById('surg-result-card');
+            const btn = document.getElementById('surg-btn');
+
+            if (!inputVal) {
+                errorBox.innerText = "Silakan masukkan deskripsi kasus bedah.";
+                errorBox.classList.remove('hidden');
+                return;
+            }
+
+            errorBox.classList.add('hidden');
+            resultCard.classList.add('hidden');
+            
+            btn.disabled = true;
+            document.getElementById('surg-btn-text').innerText = "Merancang...";
+            document.getElementById('surg-btn-icon').classList.add('hidden');
+            document.getElementById('surg-btn-spinner').classList.remove('hidden');
+
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const systemPrompt = "Anda adalah Kepala Dokter Bedah Senior sekaligus Ahli Anestesi penanggung jawab di Roxwood Hospital. Susun rencana bedah (Operative Note) mendalam, realistis dan terstruktur dengan pedoman farmakoterapi bertahap, mitigasi risiko komplikasi, serta prosedur bedah yang SANGAT DETAIL dari induksi anestesi hingga pemulihan/penutupan. Seluruh penjelasan WAJIB menggunakan Bahasa Indonesia yang baku dan sesuai EYD, namun Anda harus tetap mempertahankan istilah-istilah medis standar yang tepat.";
+            const userPrompt = `Rancang protokol bedah lengkap berdasarkan kasus berikut:\nKasus: ${inputVal}\nTipe Operasi: ${typeVal}\nAnestesi: ${anesthesiaVal}\n\nINSTRUKSI WAJIB:\n1. Durasi Operasi (Schedule).\n2. Farmakologi (Pra, Intra, Post, Discharge dengan petunjuk pasien).\n3. Risiko & Komplikasi.\n4. Tahapan Prosedur Bedah (Steps - /me & /do).\n5. Laporan Medis Pasca-Operasi (Report).`;
+
+            const medSchema = {
+                type: "ARRAY",
+                items: {
+                    type: "OBJECT",
+                    properties: { name: { type: "STRING" }, dosage: { type: "STRING" }, notes: { type: "STRING" } },
+                    required: ["name", "dosage", "notes"]
+                }
+            };
+
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            schedule: { type: "STRING" },
+                            pharmacology: {
+                                type: "OBJECT",
+                                properties: { pre_op: medSchema, intra_op: medSchema, post_op: medSchema, discharge: medSchema },
+                                required: ["pre_op", "intra_op", "post_op", "discharge"]
+                            },
+                            risks: {
+                                type: "ARRAY",
+                                items: {
+                                    type: "OBJECT",
+                                    properties: { complication: { type: "STRING" }, description: { type: "STRING" } },
+                                    required: ["complication", "description"]
+                                }
+                            },
+                            steps: { 
+                                type: "ARRAY", 
+                                items: { 
+                                    type: "OBJECT",
+                                    properties: { me: { type: "STRING" }, do: { type: "STRING" } },
+                                    required: ["me", "do"]
+                                }
+                            },
+                            report: { type: "STRING" }
+                        },
+                        required: ["schedule", "pharmacology", "risks", "steps", "report"]
+                    }
+                }
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                const result = JSON.parse(data.candidates[0].content.parts[0].text);
+
+                renderSurgeryResult(result);
+                appState.surgery.result = result;
+                saveState();
+
+            } catch (error) {
+                console.error(error);
+                errorBox.innerText = "Gagal menghubungi AI. Terjadi kesalahan saat generate JSON atau timeout server.";
+                errorBox.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                document.getElementById('surg-btn-text').innerText = "Rancang Operasi & Farmakologi";
+                document.getElementById('surg-btn-icon').classList.remove('hidden');
+                document.getElementById('surg-btn-spinner').classList.add('hidden');
+            }
+        }
+
+        // Init App
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            
+            // Listeners
+            document.getElementById('logo-btn').addEventListener('click', () => switchTab('dashboard'));
+            document.getElementById('nav-dashboard').addEventListener('click', () => switchTab('dashboard'));
+            document.getElementById('nav-diagnosis').addEventListener('click', () => switchTab('diagnosis'));
+            document.getElementById('nav-surgery').addEventListener('click', () => switchTab('surgery'));
+
+            document.getElementById('dash-btn-diagnosis').addEventListener('click', () => switchTab('diagnosis'));
+            document.getElementById('dash-btn-surgery').addEventListener('click', () => switchTab('surgery'));
+
+            document.getElementById('diag-btn').addEventListener('click', runDiagnosis);
+            document.getElementById('surg-btn').addEventListener('click', runSurgery);
+        });
+    </script>
+</body>
+</html>
